@@ -3,26 +3,16 @@
 #include "unreal_nibi_sdk.h"
 
 int main() {
-    // Create a new NibiruClientService instance using the exported Go function.
+    // Create a new NibiruClient instance using the exported Go function.
     int ret = NewNibiruClientDefault();
     if (ret != 0) {
         printf("Failed to create NibiruClient\n");
         return 1;
     }
-
-    // Get the RPC endpoint using the exported Go function.
-    // char* rpcEndpoint = RPCEndpoint(clientServicePtr);
-    // if (rpcEndpoint == NULL) {
-    //     printf("RPC endpoint is NULL\n");
-    // } else {
-    //     printf("RPC endpoint: %s\n", rpcEndpoint);
-    //     // Remember to free the C string when done.
-    //     free(rpcEndpoint);
-    // }
-
-    // Normally, you would also need to free the clientServicePtr if it was allocated in Go.
-    // However, since Go manages this memory, you should not free it in C unless you allocated
-    // it in Go using C.malloc.
-
+    //Create new wallet
+    // Generate Menomonic
+    // Create key(private,public =>signner) from menemonic
+    // Storage in keyring
+    // Get wallet address
     return 0;
 }
