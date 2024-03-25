@@ -12,6 +12,12 @@ int main() {
     //Create new wallet
     char* prases = GenerateRecoveryPhrase();
     printf("Prases %s", prases);
+
+    int createAccount = CreateAccount();
+    if (createAccount != 0) {
+        printf("Failed to create account\n");
+        return 1;
+    }
     // Generate Menomonic
     // Create key(private,public =>signner) from menemonic
     // Storage in keyring

@@ -77,6 +77,7 @@ extern "C" {
 extern int NewNibiruClientDefault();
 extern int NewNibiruClient(char* chainId, char* grpcEndpoint, char* rpcEndpoint);
 extern char* GenerateRecoveryPhrase();
+extern int CreateAccount();
 
 #ifdef __cplusplus
 }
