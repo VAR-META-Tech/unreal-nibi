@@ -4,7 +4,7 @@
 
 int main() {
     // Create a new NibiruClientService instance using the exported Go function.
-    int ret = NewNibiruClient();
+    int ret = NewNibiruClientDefault();
     if (ret != 0) {
         printf("Failed to create NibiruClient\n");
         return 1;

@@ -23,22 +23,40 @@ type C_NibiruClient struct {
 func main() {}
 
 const (
-	Success C.int = 0
-	Fail          = 1
+	Success = 0
+	Fail    = 1
 )
 
-//export NewNibiruClient
-func NewNibiruClient() C.int {
-	fmt.Printf("Call NewNibiruClient")
+//export NewNibiruClientDefault
+func NewNibiruClientDefault() C.int {
+	fmt.Println("Call [NewNibiruClientDefault]")
 	grpcConn, err := gonibi.GetGRPCConnection(gonibi.DefaultNetworkInfo.GrpcEndpoint, true, 2)
 	if err != nil {
-		fmt.Printf("GetGRPCConnection error: " + err.Error())
+		fmt.Println("[NewNibiruClientDefault] GetGRPCConnection error: " + err.Error())
 		return Fail
 	}
 	gosdk, err := gonibi.NewNibiruClient("nibiru-localnet-0", grpcConn, gonibi.DefaultNetworkInfo.TmRpcEndpoint)
-	fmt.Printf("Connected to " + gosdk.ChainId)
+	fmt.Println("[NewNibiruClientDefault] Connected to " + gosdk.ChainId)
 	if err != nil {
-		fmt.Printf("NewNibiruClient error: " + err.Error())
+		fmt.Println("[NewNibiruClientDefault] Connect to network error: " + err.Error())
+		return Fail
+	}
+
+	return Success
+}
+
+//export NewNibiruClient
+func NewNibiruClient(chainId *C.char, grpcEndpoint *C.char, rpcEndpoint *C.char) C.int {
+	fmt.Println("Call [NewNibiruClient]")
+	grpcConn, err := gonibi.GetGRPCConnection(C.GoString(grpcEndpoint), true, 2)
+	if err != nil {
+		fmt.Println("[NewNibiruClient] GetGRPCConnection error: " + err.Error())
+		return Fail
+	}
+	gosdk, err := gonibi.NewNibiruClient(C.GoString(chainId), grpcConn, C.GoString(rpcEndpoint))
+	fmt.Println("[NewNibiruClient] Connected to " + gosdk.ChainId)
+	if err != nil {
+		fmt.Println("[NewNibiruClient] Connect to network error: " + err.Error())
 		return Fail
 	}
 
