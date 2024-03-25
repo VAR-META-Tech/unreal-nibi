@@ -10,6 +10,8 @@ int main() {
         return 1;
     }
     //Create new wallet
+    char* prases = GenerateRecoveryPhrase();
+    printf("Prases %s", prases);
     // Generate Menomonic
     // Create key(private,public =>signner) from menemonic
     // Storage in keyring
