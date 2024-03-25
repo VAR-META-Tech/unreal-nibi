@@ -74,8 +74,7 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern char* NewNibiruClientService();
-extern char* RPCEndpoint(char* clientServicePtr);
+extern int NewNibiruClient();
 
 #ifdef __cplusplus
 }
