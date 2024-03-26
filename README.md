@@ -1,7 +1,10 @@
 # unreal-nibi
- Unreal client SDK for interacting with the Nibiru blockchain.
+
+Unreal client SDK for interacting with the Nibiru blockchain.
 
 # Step to build
+
+git submodule update --init --recursive
 
 go build -o unreal_nibi_sdk.so -buildmode=c-shared ./api.go
 

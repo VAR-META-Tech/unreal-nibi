@@ -76,6 +76,13 @@ extern "C" {
 
 extern int NewNibiruClientDefault();
 extern int NewNibiruClient(char* chainId, char* grpcEndpoint, char* rpcEndpoint);
+extern char* GenerateRecoveryPhrase();
+extern int CreateAccount(char* keyName, char* mnemonic);
+extern int GetPrivKeyFromMnemonic(char* mnemoic, char* keyName);
+extern int GetAddressFromMnemonic(char* mnemoic, char* keyName);
+extern int AddSignerToKeyring(char* mnemoic, char* keyName);
+extern int ImportAccount(char* mnemonic, char* privateKey, char* keyName);
+extern int DeleteAccount(char* keyName, char* password);
 
 #ifdef __cplusplus
 }
