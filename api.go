@@ -3,6 +3,8 @@ package main
 import "C"
 
 import (
+	"reflect"
+
 	"github.com/Unique-Divine/gonibi"
 	"github.com/cosmos/go-bip39"
 	"github.com/sirupsen/logrus"
@@ -10,6 +12,25 @@ import (
 
 func main() {
 
+}
+
+// Declare a global variable to hold the gosdk instance
+var gosdk gonibi.NibiruClient
+
+func init() {
+	logrus.SetFormatter(&logrus.TextFormatter{})
+	logrus.SetLevel(logrus.DebugLevel)
+
+	// Initialize the gosdk variable
+	// grpcConn, err := gonibi.GetGRPCConnection(gonibi.DefaultNetworkInfo.GrpcEndpoint, true, 2)
+	// if err != nil {
+	//     logrus.Fatalf("Failed to initialize gosdk: %s", err)
+	// }
+	// gosdk, err = gonibi.NewNibiruClient("nibiru-localnet-0", grpcConn, gonibi.DefaultNetworkInfo.TmRpcEndpoint)
+	// if err != nil {
+	//     logrus.Fatalf("Failed to initialize gosdk: %s", err)
+	// }
+	// logrus.Println("[init] gosdk initialized")
 }
 
 func init() {
@@ -21,8 +42,6 @@ const (
 	Success = 0
 	Fail    = 1
 )
-
-// get keyring by memoniic
 
 //export NewNibiruClientDefault
 func NewNibiruClientDefault() C.int {
@@ -76,59 +95,80 @@ func GenerateRecoveryPhrase() *C.char {
 }
 
 //export CreateAccount
-func CreateAccount(mnemonic *C.char) C.int {
-	// Convert C strings to Go strings
+func CreateAccount(keyName *C.char, mnemonic *C.char) C.int {
+	logrus.Debug("Creating Account")
+	mnemonicStr := C.GoString(mnemonic)
+
+	// Create a keyring
+	kring := gonibi.NewKeyring()
+	signer, privKey, err := gonibi.CreateSigner(mnemonicStr, kring, C.GoString(keyName))
+	logrus.Println("signer, privKey", signer, privKey)
+	if err != nil {
+		return Fail
+	}
+	return Success
+}
+
+//export GetPrivKeyFromMnemonic
+func GetPrivKeyFromMnemonic(mnemoic *C.char, keyName *C.char) C.int {
+	logrus.Debug("Call GetPrivKeyFromMnemonic")
+	kring := gonibi.NewKeyring()
+	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
+	logrus.Println("privkey: ", privKey, reflect.TypeOf(privKey))
+	if err != nil {
+		return Fail
+	}
+	return Success
+}
+
+//export GetAddressFromMnemonic
+func GetAddressFromMnemonic(mnemoic *C.char, keyName *C.char) C.int {
+	logrus.Println("Call GetAddressFromMnemonic")
+	kring := gonibi.NewKeyring()
+	_, addr, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
+	logrus.Println("Address:", addr)
+	if err != nil {
+		return Fail
+	}
+	return Success
+}
+
+//export AddSignerToKeyring
+func AddSignerToKeyring(mnemoic *C.char, keyName *C.char) C.int {
+	logrus.Debug("Call AddSignerToKeyring")
+	kring := gonibi.NewKeyring()
+	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
+	if err != nil {
+		logrus.Debug("Failed to get private key", err)
+		return Fail
+	}
+	if err := gonibi.AddSignerToKeyring(kring, privKey, C.GoString(keyName)); err != nil {
+		logrus.Debug("Failed to add signer to keyring", err)
+		return Fail
+	}
+	return Success
+}
+
+//export ImportAccount
+func ImportAccount(mnemonic *C.char, privateKey *C.char, keyName *C.char) C.int {
+	logrus.Debug("Import Account")
 	mnemonicStr := C.GoString(mnemonic)
 	// Create a keyring
 	kring := gonibi.NewKeyring()
-	keyName := ""
-	signer, privKey, err := gonibi.CreateSigner(mnemonicStr, kring, keyName)
-	logrus.Print("signer, privKey", signer, privKey)
+	signer, privKey, err := gonibi.CreateSigner(mnemonicStr, kring, C.GoString(keyName))
+	logrus.Println("signer, privKey", signer, privKey)
 	if err != nil {
 		return Fail
 	}
 	return Success
 }
 
-// kring keyring.Keyring, mnemonic string, keyName string,
-//
-//export GetPrivKeyFromMnemonic
-func GetPrivKeyFromMnemonic(mnemoic *C.char) C.int {
+//export DeleteAccount
+func DeleteAccount(keyName *C.char, password *C.char) C.int {
+	logrus.Debug("Call DeleteAccount")
 	kring := gonibi.NewKeyring()
-	keyName := ""
-	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), keyName)
-	logrus.Print("Private key:", privKey)
-	if err != nil {
-		return Fail
-	}
-	return Success
-}
-
-// kring keyring.Keyring, mnemonic string, keyName string,
-//
-//export GetAddressFromMnemonic
-func GetAddressFromMnemonic(mnemoic *C.char) C.int {
-	kring := gonibi.NewKeyring()
-	keyName := ""
-	_, addr, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), keyName)
-	logrus.Print("Address:", addr)
-	if err != nil {
-		return Fail
-	}
-	return Success
-}
-
-// keyring *C.char, privateKey *C.char, keyName *C.char
-
-//export AddSignerToKeyring
-func AddSignerToKeyring(mnemoic *C.char) C.int {
-	kring := gonibi.NewKeyring()
-	keyName := ""
-	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), keyName)
-	if err != nil {
-		return Fail
-	}
-	if err := gonibi.AddSignerToKeyring(kring, privKey, keyName); err != nil {
+	if err := kring.Delete(C.GoString(keyName)); err != nil {
+		logrus.Debug("Error:", err)
 		return Fail
 	}
 	return Success
