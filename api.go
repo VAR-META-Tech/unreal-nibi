@@ -1,11 +1,54 @@
 package main
 
-import "C"
+/*
+#include <stdint.h> // for uint32_t
 
+// If crypto.Address and crypto.PubKey are fixed-size byte arrays, define their sizes
+#define ADDRESS_SIZE 20 // Example size, adjust according to actual crypto.Address size
+#define PUBKEY_SIZE  58 // Example size, adjust according to actual crypto.PubKey size
+
+// Define a C-compatible KeyInfo struct
+typedef struct {
+	uint32_t Type;
+	const char* Name;
+	const uint8_t PubKey[PUBKEY_SIZE];
+	const uint8_t Address[ADDRESS_SIZE];
+} KeyInfo;
+
+typedef struct {
+	KeyInfo* Info;
+	char* Password;
+} UserAccount;
+
+// Define the Coin type in C, assuming both Denom and Amount are strings
+typedef struct {
+    char *Denom;
+    uint64_t Amount;
+} Coin;
+
+// If Coins is a dynamic array or slice of Coin, you will need a struct to represent it
+typedef struct {
+    Coin *Array;     // Pointer to the first Coin element
+    size_t Length;   // Number of elements in the Coins array
+} Coins;
+
+// Then define the BaseAccount struct in C
+typedef struct {
+    uint8_t Address[ADDRESS_SIZE];
+    Coins*   Coins;              // Assuming Coins is represented as above
+    uint8_t PubKey[PUBKEY_SIZE];
+    uint64_t AccountNumber;
+    uint64_t Sequence;
+} BaseAccount;
+*/
+import "C"
 import (
-	"reflect"
+	"unsafe"
 
 	"github.com/Unique-Divine/gonibi"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
 	"github.com/sirupsen/logrus"
 )
@@ -14,28 +57,23 @@ func main() {
 
 }
 
-// Declare a global variable to hold the gosdk instance
 var gosdk gonibi.NibiruClient
 
 func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
 
-	// Initialize the gosdk variable
-	// grpcConn, err := gonibi.GetGRPCConnection(gonibi.DefaultNetworkInfo.GrpcEndpoint, true, 2)
-	// if err != nil {
-	//     logrus.Fatalf("Failed to initialize gosdk: %s", err)
-	// }
-	// gosdk, err = gonibi.NewNibiruClient("nibiru-localnet-0", grpcConn, gonibi.DefaultNetworkInfo.TmRpcEndpoint)
-	// if err != nil {
-	//     logrus.Fatalf("Failed to initialize gosdk: %s", err)
-	// }
-	// logrus.Println("[init] gosdk initialized")
-}
+	grpcConn, err := gonibi.GetGRPCConnection(gonibi.DefaultNetworkInfo.GrpcEndpoint, true, 2)
+	if err != nil {
+		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+	}
 
-func init() {
-	logrus.SetFormatter(&logrus.TextFormatter{})
-	logrus.SetLevel(logrus.DebugLevel)
+	gosdk, err = gonibi.NewNibiruClient("nibiru-localnet-0", grpcConn, gonibi.DefaultNetworkInfo.TmRpcEndpoint)
+	if err != nil {
+		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+	}
+
+	logrus.Println("[init] Nibiru client initialized")
 }
 
 const (
@@ -94,15 +132,83 @@ func GenerateRecoveryPhrase() *C.char {
 	return C.CString(phrase)
 }
 
-//export CreateAccount
-func CreateAccount(keyName *C.char, mnemonic *C.char) C.int {
-	logrus.Debug("Creating Account")
-	mnemonicStr := C.GoString(mnemonic)
+// ToCKeyInfo converts KeyInfo to its C representation.
+func convertKeyInfo(key *keyring.Record) *C.KeyInfo {
+	// Allocate memory for KeyInfo in C.
+	cKeyInfo := (*C.KeyInfo)(C.malloc(C.sizeof_KeyInfo))
+	if cKeyInfo == nil {
+		// Handle allocation failure if needed
+		return nil
+	}
 
+	// Set fields in the KeyInfo struct.
+	cKeyInfo.Type = C.uint32_t(key.GetType())
+	cKeyInfo.Name = C.CString(key.Name) // This will need to be freed in C.
+
+	// Copy the public key bytes.
+	pubkey, err := key.GetPubKey()
+	if err != nil {
+		logrus.Error("Can't get public key")
+		return nil
+	}
+
+	pubKeyBytes := pubkey.Bytes()
+
+	if len(pubKeyBytes) > len(cKeyInfo.PubKey) {
+		// Handle error: the address is too big for the allocated array.
+		// C.free(unsafe.Pointer(cKeyInfo.Name))
+		// C.free(unsafe.Pointer(cKeyInfo))
+		return nil
+	}
+	for i, b := range pubKeyBytes {
+		cKeyInfo.PubKey[i] = C.uint8_t(b)
+	}
+
+	// Copy the address bytes.
+	address, err := key.GetAddress()
+	if err != nil {
+		logrus.Error("Can't get public key", err)
+		return nil
+	}
+	addressBytes := address.Bytes()
+	if len(addressBytes) > len(cKeyInfo.Address) {
+		// Handle error: the address is too big for the allocated array.
+		// C.free(unsafe.Pointer(cKeyInfo.Name))
+		// C.free(unsafe.Pointer(cKeyInfo))
+		return nil
+	}
+	for i, b := range addressBytes {
+		cKeyInfo.Address[i] = C.uint8_t(b)
+	}
+
+	// Return the heap-allocated KeyInfo.
+	return cKeyInfo
+}
+
+//export CreateAccount
+func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
+	logrus.Debug("Call Creating Account")
+	algo := hd.Secp256k1
 	// Create a keyring
-	kring := gonibi.NewKeyring()
-	signer, privKey, err := gonibi.CreateSigner(mnemonicStr, kring, C.GoString(keyName))
-	logrus.Println("signer, privKey", signer, privKey)
+	record, err := gosdk.Keyring.NewAccount(C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase), sdk.GetConfig().GetFullBIP44Path(), algo)
+
+	logrus.Println("Account created:", record.String())
+	if err != nil {
+		logrus.Debug("Failed to create new account", err)
+		return Fail
+	}
+	PrintListSigners()
+	return Success
+}
+
+//export CreateAccountV2
+func CreateAccountV2(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
+	logrus.Debug("Call Creating Account")
+	// Create a keyring
+	keyRing := gosdk.Keyring
+	mnemonicStr := C.GoString(mnemonic)
+	signer, _, err := gonibi.CreateSigner(mnemonicStr, keyRing, C.GoString(keyName))
+	logrus.Println("Account Created:", signer.String())
 	if err != nil {
 		return Fail
 	}
@@ -110,66 +216,180 @@ func CreateAccount(keyName *C.char, mnemonic *C.char) C.int {
 }
 
 //export GetPrivKeyFromMnemonic
-func GetPrivKeyFromMnemonic(mnemoic *C.char, keyName *C.char) C.int {
+func GetPrivKeyFromMnemonic(mnemoic *C.char, keyName *C.char) *C.char {
 	logrus.Debug("Call GetPrivKeyFromMnemonic")
-	kring := gonibi.NewKeyring()
+	kring := gosdk.Keyring
 	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
-	logrus.Println("privkey: ", privKey, reflect.TypeOf(privKey))
 	if err != nil {
-		return Fail
+		logrus.Debug("Failed to get priv key", err)
+		return nil
 	}
-	return Success
+	return C.CString(privKey.String())
 }
 
 //export GetAddressFromMnemonic
-func GetAddressFromMnemonic(mnemoic *C.char, keyName *C.char) C.int {
+func GetAddressFromMnemonic(mnemoic *C.char, keyName *C.char) *C.char {
 	logrus.Println("Call GetAddressFromMnemonic")
-	kring := gonibi.NewKeyring()
+	kring := gosdk.Keyring
 	_, addr, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
-	logrus.Println("Address:", addr)
 	if err != nil {
-		return Fail
+		logrus.Debug("Failed to get address", err)
+		return nil
 	}
-	return Success
+	return C.CString(addr.String())
 }
 
-//export AddSignerToKeyring
-func AddSignerToKeyring(mnemoic *C.char, keyName *C.char) C.int {
-	logrus.Debug("Call AddSignerToKeyring")
-	kring := gonibi.NewKeyring()
-	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
-	if err != nil {
-		logrus.Debug("Failed to get private key", err)
-		return Fail
-	}
-	if err := gonibi.AddSignerToKeyring(kring, privKey, C.GoString(keyName)); err != nil {
-		logrus.Debug("Failed to add signer to keyring", err)
-		return Fail
-	}
-	return Success
-}
-
-//export ImportAccount
-func ImportAccount(mnemonic *C.char, privateKey *C.char, keyName *C.char) C.int {
+//export ImportAccountFromMnemoic
+func ImportAccountFromMnemoic(mnemonic *C.char, keyName *C.char) C.int {
 	logrus.Debug("Import Account")
 	mnemonicStr := C.GoString(mnemonic)
 	// Create a keyring
-	kring := gonibi.NewKeyring()
-	signer, privKey, err := gonibi.CreateSigner(mnemonicStr, kring, C.GoString(keyName))
-	logrus.Println("signer, privKey", signer, privKey)
+	kring := gosdk.Keyring
+	signer, _, err := gonibi.CreateSigner(mnemonicStr, kring, C.GoString(keyName))
+	if err != nil {
+		logrus.Debug("Failed to import account:", err)
+		return Fail
+	}
+	logrus.Println("Susscess to import account:", signer.Name, signer.PubKey.String(), signer.GetLedger().String())
+	return Success
+}
+
+// //export ImportAccountFromPrivateKey
+// func ImportAccountFromPrivateKey(privateKey *C.char, keyName *C.char) C.int {
+// 	logrus.Debug("Import Account")
+// 	privKey := C.GoString(privateKey)
+// 	privKeyBytes := []byte(privKey)
+// 	// Create a keyring
+// 	signer, err := gonibi.CreateSignerFromPrivKey(privKeyBytes, C.GoString(keyName))
+// 	logrus.Println("signer, privKey", signer.String())
+// 	if err != nil {
+// 		return Fail
+// 	}
+// 	return Success
+// }
+
+//export GetListAccount
+func GetListAccount(length *C.int) **C.KeyInfo {
+	logrus.Debug("Call GetListAccount")
+	keys, err := gosdk.Keyring.List()
+	if err != nil {
+		*length = 0
+		return nil
+	}
+
+	*length = C.int(len(keys))
+
+	// Allocate memory for the array of pointers
+	keyInfos := C.malloc(C.size_t(len(keys)) * C.size_t(unsafe.Sizeof(uintptr(0))))
+
+	// Convert the allocated memory to **C.KeyInfo
+	cKeyInfos := (**C.KeyInfo)(keyInfos)
+
+	// Iterate over the keys and assign each pointer
+	for i, key := range keys {
+		// Allocate memory for the KeyInfo struct
+		keyInfo := (*C.KeyInfo)(C.malloc(C.size_t(unsafe.Sizeof(C.KeyInfo{}))))
+
+		// Assign values to the KeyInfo struct
+		keyInfo.Name = C.CString(key.Name)
+		// Assign other fields of KeyInfo struct as needed
+
+		// Assign the pointer to the array
+		(*[1 << 30]unsafe.Pointer)(unsafe.Pointer(keyInfos))[i] = unsafe.Pointer(keyInfo)
+	}
+
+	return cKeyInfos
+}
+
+//export GetAccountByKeyName
+func GetAccountByKeyName(keyName *C.char) *C.KeyInfo {
+	logrus.Debug("Call GetAccountByKeyName")
+	keyInfo, err := gosdk.Keyring.Key(C.GoString(keyName))
+	if err != nil {
+		logrus.Error("GetAccountByKeyName Failed: ", err)
+		return nil
+	}
+
+	logrus.Debug("Account find: ", keyInfo)
+	return convertKeyInfo(keyInfo)
+}
+
+//export GetAccountByAddress
+func GetAccountByAddress(addr *C.char) *C.KeyInfo {
+	logrus.Debug("Call GetAccountByAddress")
+	address, err := sdk.AccAddressFromBech32(C.GoString(addr))
+	if err != nil {
+		logrus.Error("GetAccountByaddr Failed: ", err)
+		return nil
+	}
+	keyInfo, err := gosdk.Keyring.KeyByAddress(address)
+	if err != nil {
+		logrus.Error("GetAccountByaddr Failed: ", err)
+		return nil
+	}
+
+	return convertKeyInfo(keyInfo)
+}
+
+//export HasKeyByName
+func HasKeyByName(name *C.char) C.int {
+	logrus.Debug("HasKeyByName called")
+	has, err := gosdk.Keyring.Key(C.GoString(name))
+	if err != nil {
+		logrus.Error("HasKeyByName Fail: ", err)
+		return Fail
+	}
+
+	if has != nil {
+		return Success
+	} else {
+		return Fail
+	}
+}
+
+//export HasKeyByAddress
+func HasKeyByAddress(addr *C.char, len C.int) C.int {
+	logrus.Debug("HasKeyByAddress called")
+	address, err := sdk.AccAddressFromBech32(C.GoString(addr))
 	if err != nil {
 		return Fail
 	}
-	return Success
+
+	a, err := gosdk.Keyring.KeyByAddress(address)
+	if err != nil {
+		logrus.Error("GetAccountByAddr Fail: ", err)
+		return Fail
+	}
+
+	if a != nil {
+		logrus.Debug("keyInfor ", a.String())
+		return Success
+	} else {
+		return Fail
+	}
+}
+
+func PrintListSigners() {
+	logrus.Debug("Call GetListAccount")
+	signers, err := gosdk.Keyring.List()
+	if err != nil {
+		logrus.Debug("Error can't get list signer:", err)
+	}
+
+	for _, signer := range signers {
+		logrus.Debug("Signer name: ", signer.Name, signer.GetType())
+	}
 }
 
 //export DeleteAccount
 func DeleteAccount(keyName *C.char, password *C.char) C.int {
 	logrus.Debug("Call DeleteAccount")
-	kring := gonibi.NewKeyring()
-	if err := kring.Delete(C.GoString(keyName)); err != nil {
+
+	err := gosdk.Keyring.Delete(C.GoString(keyName))
+	if err != nil {
 		logrus.Debug("Error:", err)
 		return Fail
 	}
+	PrintListSigners()
 	return Success
 }
