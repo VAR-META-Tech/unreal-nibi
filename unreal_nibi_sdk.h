@@ -122,9 +122,10 @@ extern int NewNibiruClient(char* chainId, char* grpcEndpoint, char* rpcEndpoint)
 extern char* GenerateRecoveryPhrase();
 extern int CreateAccount(char* keyName, char* mnemonic, char* passphase);
 extern int CreateAccountV2(char* keyName, char* mnemonic, char* passphase);
-extern char* GetPrivKeyFromMnemonic(char* mnemoic, char* keyName);
+extern uint8_t* GetPrivKeyFromMnemonic(char* mnemoic, char* keyName);
 extern char* GetAddressFromMnemonic(char* mnemoic, char* keyName);
 extern int ImportAccountFromMnemoic(char* mnemonic, char* keyName);
+extern int ImportAccountFromPrivateKey(uint8_t* privateKey, char* keyName);
 extern KeyInfo** GetListAccount(int* length);
 extern KeyInfo* GetAccountByKeyName(char* keyName);
 extern KeyInfo* GetAccountByAddress(char* addr);

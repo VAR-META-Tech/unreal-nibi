@@ -27,7 +27,7 @@ int main()
         return 1;
     }
 
-    char *privkey = GetPrivKeyFromMnemonic(prases, keyName);
+    u_int8_t *privkey = GetPrivKeyFromMnemonic(prases, keyName);
     if (privkey == NULL)
     {
         printf("Failed to get private key\n");
@@ -50,6 +50,14 @@ int main()
     if (import != 0)
     {
         printf("\nFailed to import account\n");
+        return 1;
+    }
+
+    int importP = ImportAccountFromPrivateKey(privkey, keyName);
+
+    if (importP != 0)
+    {
+        printf("\nFailed to import account from privateKey\n");
         return 1;
     }
 

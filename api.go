@@ -48,6 +48,7 @@ import (
 	"github.com/Unique-Divine/gonibi"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
 	"github.com/sirupsen/logrus"
@@ -216,7 +217,7 @@ func CreateAccountV2(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int
 }
 
 //export GetPrivKeyFromMnemonic
-func GetPrivKeyFromMnemonic(mnemoic *C.char, keyName *C.char) *C.char {
+func GetPrivKeyFromMnemonic(mnemoic *C.char, keyName *C.char) *C.uint8_t {
 	logrus.Debug("Call GetPrivKeyFromMnemonic")
 	kring := gosdk.Keyring
 	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
@@ -224,7 +225,49 @@ func GetPrivKeyFromMnemonic(mnemoic *C.char, keyName *C.char) *C.char {
 		logrus.Debug("Failed to get priv key", err)
 		return nil
 	}
-	return C.CString(privKey.String())
+	logrus.Info(" C.CString(privKey.Bytes())", privKey.Bytes())
+	logrus.Info("Priv Pub String", privKey.PubKey().String())
+	return revertToCData(privKey.Bytes())
+}
+
+// Revert C data and length to Go byte slice
+func revertToCData(byteSlice []byte) *C.uint8_t {
+	// Ensure the byte slice is not nil
+	if byteSlice == nil {
+		return nil
+	}
+
+	// Create a new C byte array
+	cData := C.malloc(C.size_t(len(byteSlice)))
+	if cData == nil {
+		return nil
+	}
+
+	// Copy data from byte slice to C array
+	cSlice := (*[1 << 30]byte)(cData)[:len(byteSlice):len(byteSlice)]
+	copy(cSlice, byteSlice)
+	// Defer the free operation to release the allocated memory
+
+	return (*C.uint8_t)(cData)
+}
+
+// Convert a *C.uint8_t pointer to a Go byte slice
+func cUint8ToGoSlice(cData *C.uint8_t) []byte {
+	if cData == nil {
+		return nil
+	}
+
+	// Calculate the length of the C data dynamically
+	var length int
+	for length = 0; *(*C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(cData)) + uintptr(length))) != 0; length++ {
+	}
+
+	// Convert C data to Go slice
+	goSlice := make([]byte, length)
+	for i := 0; i < length; i++ {
+		goSlice[i] = byte(*((*C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(cData)) + uintptr(i)))))
+	}
+	return goSlice
 }
 
 //export GetAddressFromMnemonic
@@ -254,19 +297,29 @@ func ImportAccountFromMnemoic(mnemonic *C.char, keyName *C.char) C.int {
 	return Success
 }
 
-// //export ImportAccountFromPrivateKey
-// func ImportAccountFromPrivateKey(privateKey *C.char, keyName *C.char) C.int {
-// 	logrus.Debug("Import Account")
-// 	privKey := C.GoString(privateKey)
-// 	privKeyBytes := []byte(privKey)
-// 	// Create a keyring
-// 	signer, err := gonibi.CreateSignerFromPrivKey(privKeyBytes, C.GoString(keyName))
-// 	logrus.Println("signer, privKey", signer.String())
-// 	if err != nil {
-// 		return Fail
-// 	}
-// 	return Success
-// }
+//export ImportAccountFromPrivateKey
+func ImportAccountFromPrivateKey(privateKey *C.uint8_t, keyName *C.char) C.int {
+	logrus.Debug("Import Account")
+	// Decode the private key string from hex
+	privKeyBytes := cUint8ToGoSlice(privateKey)
+	if privKeyBytes == nil {
+		logrus.Debug("Can not get private key")
+	}
+
+	// Create a PrivKey instance and assign the decoded bytes to its Key field
+	privKey := secp256k1.PrivKey{
+		Key: privKeyBytes,
+	}
+
+	logrus.Info("Priv Pub String", privKey.PubKey().String())
+	// Create a keyring
+	signer, err := gonibi.CreateSignerFromPrivKey(&privKey, C.GoString(keyName))
+	logrus.Info("Import New Account Success", signer.String())
+	if err != nil {
+		return Fail
+	}
+	return Success
+}
 
 //export GetListAccount
 func GetListAccount(length *C.int) **C.KeyInfo {
