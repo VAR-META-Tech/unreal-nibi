@@ -20,7 +20,7 @@ int main()
 
     // Create key(private,public =>signner) from menemonic
     char *passPrares = "pass";
-    int createAccount = CreateAccountV2(keyName, prases, passPrares);
+    int createAccount = CreateAccount(keyName, prases, passPrares);
     if (createAccount != 0)
     {
         printf("Failed to create account\n");
@@ -34,10 +34,16 @@ int main()
         return 1;
     }
 
-    printf("Private Key: %s\n", privkey);
+    // int import = ImportAccountFromMnemoic(prases, keyName);
+
+    // if (import != 0)
+    // {
+    //     printf("\nFailed to import account\n");
+    //     return 1;
+    // }
 
     // Get wallet address
-    char *address = GetAddressFromMnemonic(prases, keyName);
+    char *address = GetAddressFromKeyName(keyName);
     if (address == NULL)
     {
         printf("Failed to get Address key\n");
@@ -45,51 +51,63 @@ int main()
     }
     printf("Private Address: %s\n", address);
 
-    int import = ImportAccountFromMnemoic(prases, keyName);
+    // int importP = ImportAccountFromPrivateKey(privkey, keyName);
 
-    if (import != 0)
+    // if (importP != 0)
+    // {
+    //     printf("\nFailed to import account from privateKey\n");
+    //     return 1;
+    // }
+
+    // int len;
+
+    // KeyInfo **keyInfos = GetListAccount(&len);
+
+    // if (keyInfos != NULL)
+    // {
+    //     // Use the keyInfos array
+    //     for (int i = 0; i < len; ++i)
+    //     {
+    //         KeyInfo *keyInfo = keyInfos[i];
+    //         // Do something with keyInfo, e.g., print it
+    //         printf("Key Name: %s\n", keyInfo->Name);
+    //         printf("Key Type: %d\n", keyInfo->Type);
+    //         // printf("Key Address: %s\n", keyInfo->Address);
+    //         // printf("Key PubKey: %s\n", keyInfo->PubKey);
+    //     }
+    // }
+
+    // KeyInfo *keyInfo = GetAccountByKeyName(keyName);
+    // if (keyInfo != NULL)
+    // {
+    //     printf("KeyInfo: %s\n", keyInfo->Name);
+    // }
+
+    KeyInfo *KeyInfo2 = GetAccountByAddress(address);
+    if (KeyInfo2 != NULL)
     {
-        printf("\nFailed to import account\n");
-        return 1;
+        printf("KeyInfo Address: %s\n", KeyInfo2->Address);
     }
 
-    int importP = ImportAccountFromPrivateKey(privkey, keyName);
+    // int deleteAccount = DeleteAccount(keyName, passPrares);
+    // if (deleteAccount != 0)
+    // {
+    //     printf("\nFailed to delete account\n");
+    //     return 1;
+    // }
 
-    if (importP != 0)
+    BaseAccount *baseAcc = QueryAccount(address);
+    if (baseAcc != NULL)
     {
-        printf("\nFailed to import account from privateKey\n");
-        return 1;
-    }
-
-    int len;
-
-    KeyInfo **keyInfos = GetListAccount(&len);
-
-    if (keyInfos != NULL)
-    {
-        // Use the keyInfos array
-        for (int i = 0; i < len; ++i)
+        printf("User coins count: %lu\n", baseAcc->Coins->Length);
+        for (int i = 0; i < baseAcc->Coins->Length; i++)
         {
-            KeyInfo *keyInfo = keyInfos[i];
-            // Do something with keyInfo, e.g., print it
-            printf("Key Name: %s\n", keyInfo->Name);
-            printf("Key Type: %d\n", keyInfo->Type);
-            // printf("Key Address: %s\n", keyInfo->Address);
-            // printf("Key PubKey: %s\n", keyInfo->PubKey);
+            printf("%d, %s coins have %llu\n", i + 1, baseAcc->Coins->Array[i].Denom, baseAcc->Coins->Array[i].Amount);
         }
     }
-
-    KeyInfo *keyInfo = GetAccountByKeyName(keyName);
-    if (keyInfo != NULL)
+    else
     {
-        printf("KeyInfo: %s\n", keyInfo->Name);
-    }
-
-    int deleteAccount = DeleteAccount(keyName, passPrares);
-    if (deleteAccount != 0)
-    {
-        printf("\nFailed to delete account\n");
-        return 1;
+        printf("\n Err: can't get base account");
     }
 
     return 0;

@@ -43,6 +43,8 @@ typedef struct {
 */
 import "C"
 import (
+	"context"
+	"fmt"
 	"unsafe"
 
 	"github.com/Unique-Divine/gonibi"
@@ -50,6 +52,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	aKeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	keeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/cosmos/go-bip39"
 	"github.com/sirupsen/logrus"
 )
@@ -58,7 +64,46 @@ func main() {
 
 }
 
+type UserAccount struct {
+	KeyInfo  keyring.Record
+	Password string
+}
+
 var gosdk gonibi.NibiruClient
+var sdkCtx sdk.Context
+var accountKeeper aKeeper.AccountKeeper
+
+const (
+	holder     = "holder"
+	multiPerm  = "multiple permissions account"
+	randomPerm = "random permission"
+)
+
+var (
+	multiPermAcc  = types.NewEmptyModuleAccount(multiPerm, types.Burner, types.Minter, types.Staking)
+	randomPermAcc = types.NewEmptyModuleAccount(randomPerm, "random")
+)
+
+func initAccountKeeper() {
+	key := sdk.NewKVStoreKey(authtypes.StoreKey)
+
+	maccPerms := map[string][]string{
+		"fee_collector":          nil,
+		"mint":                   {"minter"},
+		"bonded_tokens_pool":     {"burner", "staking"},
+		"not_bonded_tokens_pool": {"burner", "staking"},
+		multiPerm:                {"burner", "minter", "staking"},
+		randomPerm:               {"random"},
+	}
+	accountKeeper = aKeeper.NewAccountKeeper(
+		gosdk.EncCfg.Marshaler,
+		key,
+		types.ProtoBaseAccount,
+		maccPerms,
+		"cosmos",
+		types.NewModuleAddress("gov").String(),
+	)
+}
 
 func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{})
@@ -74,6 +119,7 @@ func init() {
 		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
 	}
 
+	sdkCtx = sdk.Context{}
 	logrus.Println("[init] Nibiru client initialized")
 }
 
@@ -81,6 +127,176 @@ const (
 	Success = 0
 	Fail    = 1
 )
+
+// Niburu method
+
+func GetAccountInfo(
+	address string,
+) (account authtypes.AccountI, err error) {
+
+	addr, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		logrus.Error("Can't get account address", err)
+		return account, err
+	}
+	baseAcc := accountKeeper.GetAccount(sdkCtx, addr)
+
+	// register auth interface
+	logrus.Info("Address: ", baseAcc.GetAddress().String())
+
+	return baseAcc, err
+}
+
+func GetListAccountInfo() (err error) {
+
+	queryClient := authtypes.NewQueryClient(gosdk.Querier.ClientConn)
+	resp, err := queryClient.Accounts(context.Background(), &authtypes.QueryAccountsRequest{})
+	if err != nil {
+		return err
+	}
+	// register auth interface
+
+	for _, v := range resp.Accounts {
+		var acc authtypes.AccountI
+		gosdk.EncCfg.InterfaceRegistry.UnpackAny(v, &acc)
+		if v != nil {
+			logrus.Info(acc.GetAddress().String())
+		}
+	}
+	return nil
+}
+
+// func GetListAccountInfo() (err error) {
+
+// 	var accountKeeper aKeeper.AccountKeeper
+// 	baseAcc := accountKeeper.GetAllAccounts(sdkCtx)
+
+// 	// register auth interface
+// 	for _, v := range baseAcc {
+// 		if v == nil {
+// 			continue
+// 		}
+// 		logrus.Info("Address: ", v.GetAddress().String())
+// 	}
+
+// 	return err
+// }
+
+func GetAccountCoins(
+	address *C.char,
+) (sdk.Coins, error) {
+	addr, err := sdk.AccAddressFromBech32(C.GoString(address))
+	if err != nil {
+		logrus.Error("Can't get account address")
+		return nil, err
+	}
+
+	ctx := sdk.Context{}
+	var viewKeeper keeper.BaseViewKeeper
+	if err := viewKeeper.ValidateBalance(ctx, addr); err != nil {
+		fmt.Printf("Error validating balance: %s\n", err.Error())
+	}
+
+	coins := viewKeeper.GetAllBalances(ctx, addr)
+
+	return coins, nil
+}
+
+//export QueryAccount
+func QueryAccount(address *C.char) *C.BaseAccount {
+	logrus.Debug("Call QueryAccount")
+
+	if err := GetListAccountInfo(); err != nil {
+		logrus.Info(err)
+	}
+
+	addr, err := sdk.AccAddressFromBech32(C.GoString(address))
+	if err != nil {
+		logrus.Error("GetAccountByaddr Failed: ", err)
+		return nil
+	}
+	logrus.Info("QueryAccount ~ addr:", addr.String())
+	account, err := GetAccountInfo(C.GoString(address))
+	if err != nil {
+		logrus.Error("Account not found: ", err)
+		return nil
+	}
+
+	logrus.Info("QueryAccount ~ Account:", account)
+	// Allocate memory for BaseAccount in C.
+	cAccount := (*C.BaseAccount)(C.malloc(C.sizeof_BaseAccount))
+	if cAccount == nil {
+		// Handle allocation failure if needed
+		return nil
+	}
+
+	// Allocate memory for Coins in C.
+	cAccount.Coins = (*C.Coins)(C.malloc(C.sizeof_Coins))
+	if cAccount.Coins == nil {
+		// Handle allocation failure if needed
+		// C.free(unsafe.Pointer(cAccount))
+		return nil
+	}
+	// get account coin
+
+	accountCoins, err := GetAccountCoins(address)
+	if err != nil {
+		logrus.Error("Can't get account coins")
+		return nil
+	}
+	cAccount.Coins.Length = C.size_t(len(accountCoins))
+	cAccount.Coins.Array = (*C.Coin)(C.malloc(C.sizeof_Coin * cAccount.Coins.Length))
+	if cAccount.Coins.Array == nil {
+		// Handle allocation failure if needed
+		// C.free(unsafe.Pointer(cAccount.Coins))
+		// C.free(unsafe.Pointer(cAccount))
+		return nil
+	}
+
+	cCoinPtr := cAccount.Coins.Array
+	for _, coin := range accountCoins {
+		// Allocate and set the C string equivalents
+		cCoinPtr.Denom = C.CString(coin.Denom)
+		cCoinPtr.Amount = C.uint64_t(coin.Amount.Int64())
+		// Move the pointer to the next array element; this is equivalent to incrementing an array index
+		cCoinPtr = (*C.Coin)(unsafe.Pointer(uintptr(unsafe.Pointer(cCoinPtr)) + C.sizeof_Coin))
+	}
+
+	// Copy the account address bytes to the C struct.
+	addressBytes := account.GetAddress().Bytes()
+	if len(addressBytes) > len(cAccount.Address) {
+		// Handle error: the address is too big for the allocated array.
+		// Remember to free all previously allocated memory.
+		// C.free(unsafe.Pointer(cAccount.Coins.Array))
+		// C.free(unsafe.Pointer(cAccount.Coins))
+		// C.free(unsafe.Pointer(cAccount))
+		return nil
+	}
+	for i, b := range addressBytes {
+		cAccount.Address[i] = C.uint8_t(b)
+	}
+
+	// Copy the public key bytes to the C struct if a public key is present.
+	if account.GetPubKey() != nil {
+		pubKeyBytes := account.GetPubKey().Bytes()
+		if len(pubKeyBytes) > len(cAccount.PubKey) {
+			// Handle error: the public key is too big for the allocated array.
+			// Remember to free all previously allocated memory.
+			// C.free(unsafe.Pointer(cAccount.Coins.Array))
+			// C.free(unsafe.Pointer(cAccount.Coins))
+			// C.free(unsafe.Pointer(cAccount))
+			return nil
+		}
+		for i, b := range pubKeyBytes {
+			cAccount.PubKey[i] = C.uint8_t(b)
+		}
+	}
+
+	cAccount.AccountNumber = C.uint64_t(account.GetAccountNumber())
+	cAccount.Sequence = C.uint64_t(account.GetSequence())
+
+	return cAccount
+}
 
 //export NewNibiruClientDefault
 func NewNibiruClientDefault() C.int {
@@ -134,6 +350,7 @@ func GenerateRecoveryPhrase() *C.char {
 }
 
 // ToCKeyInfo converts KeyInfo to its C representation.
+// todo: currently it's wrong
 func convertKeyInfo(key *keyring.Record) *C.KeyInfo {
 	// Allocate memory for KeyInfo in C.
 	cKeyInfo := (*C.KeyInfo)(C.malloc(C.sizeof_KeyInfo))
@@ -192,28 +409,51 @@ func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
 	algo := hd.Secp256k1
 	// Create a keyring
 	record, err := gosdk.Keyring.NewAccount(C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase), sdk.GetConfig().GetFullBIP44Path(), algo)
-
-	logrus.Println("Account created:", record.String())
 	if err != nil {
 		logrus.Debug("Failed to create new account", err)
 		return Fail
 	}
-	PrintListSigners()
+
+	logrus.Printf("Account created: %s, %s\n", record.Name, record.PubKey.String())
+	addr, err := record.GetAddress()
+	if err != nil {
+		return 1
+	}
+
+	logrus.Info("Account Address: ", addr)
+	GetListAccountInfo()
+	newAccounts, err := gosdk.Keyring.MigrateAll()
+	logrus.Println("New AACS:", newAccounts)
+	GetListAccountInfo()
+	// baseAcc, err := NewBaseAccount(*record)
+	// if err != nil || baseAcc == nil {
+	// 	logrus.Debug("Failed to create new base account", err)
+	// }
 	return Success
 }
 
-//export CreateAccountV2
-func CreateAccountV2(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
-	logrus.Debug("Call Creating Account")
-	// Create a keyring
-	keyRing := gosdk.Keyring
-	mnemonicStr := C.GoString(mnemonic)
-	signer, _, err := gonibi.CreateSigner(mnemonicStr, keyRing, C.GoString(keyName))
-	logrus.Println("Account Created:", signer.String())
+func NewBaseAccount(keyInfo keyring.Record) (account *authtypes.BaseAccount, err error) {
+	logrus.Info("Call NewBaseAccount")
+	keyAddr, err := keyInfo.GetAddress()
+	logrus.Info("Account Address: ", keyAddr)
 	if err != nil {
-		return Fail
+		logrus.Error("Can't get address: ", err)
+		return account, err
 	}
-	return Success
+	pubKey, err := keyInfo.GetPubKey()
+	if err != nil {
+		logrus.Error("Can't get pubkey: ", err)
+		return account, err
+	}
+	var accNumber uint64 = 0
+	var accSequence uint64 = 0
+	acc := authtypes.NewBaseAccount(keyAddr, pubKey, accNumber, accSequence)
+	accI := accountKeeper.NewAccount(sdkCtx, acc)
+	if accI != nil {
+		logrus.Info("Account Address: ", accI.GetAddress().String())
+	}
+
+	return acc, nil
 }
 
 //export GetPrivKeyFromMnemonic
@@ -225,8 +465,7 @@ func GetPrivKeyFromMnemonic(mnemoic *C.char, keyName *C.char) *C.uint8_t {
 		logrus.Debug("Failed to get priv key", err)
 		return nil
 	}
-	logrus.Info(" C.CString(privKey.Bytes())", privKey.Bytes())
-	logrus.Info("Priv Pub String", privKey.PubKey().String())
+	logrus.Info("Address String", privKey.PubKey().Address())
 	return revertToCData(privKey.Bytes())
 }
 
@@ -270,30 +509,42 @@ func cUint8ToGoSlice(cData *C.uint8_t) []byte {
 	return goSlice
 }
 
-//export GetAddressFromMnemonic
-func GetAddressFromMnemonic(mnemoic *C.char, keyName *C.char) *C.char {
-	logrus.Println("Call GetAddressFromMnemonic")
-	kring := gosdk.Keyring
-	_, addr, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
+//export GetAddressFromKeyName
+func GetAddressFromKeyName(keyName *C.char) *C.char {
+	logrus.Println("Call GetAddressFromKeyName")
+	keyInfo, err := gosdk.Keyring.Key(C.GoString(keyName))
 	if err != nil {
 		logrus.Debug("Failed to get address", err)
 		return nil
 	}
+	addr, err := keyInfo.GetAddress()
+	if err != nil {
+		logrus.Debug("Failed to get address", err)
+		return nil
+	}
+
+	logrus.Info("Return Address: ", addr.String())
+
 	return C.CString(addr.String())
 }
 
 //export ImportAccountFromMnemoic
 func ImportAccountFromMnemoic(mnemonic *C.char, keyName *C.char) C.int {
-	logrus.Debug("Import Account")
+	logrus.Debug("Call Import Account")
+	// GetListAccountInfo()
 	mnemonicStr := C.GoString(mnemonic)
 	// Create a keyring
 	kring := gosdk.Keyring
-	signer, _, err := gonibi.CreateSigner(mnemonicStr, kring, C.GoString(keyName))
+	signer, privateKey, err := gonibi.CreateSigner(mnemonicStr, kring, C.GoString(keyName))
 	if err != nil {
 		logrus.Debug("Failed to import account:", err)
 		return Fail
 	}
-	logrus.Println("Susscess to import account:", signer.Name, signer.PubKey.String(), signer.GetLedger().String())
+	if err := gonibi.AddSignerToKeyring(kring, privateKey, privateKey.PubKey().String()); err != nil {
+		logrus.Error("Can't assing singer to keyring: ", err)
+		return Fail
+	}
+	logrus.Printf("Susscess to import account: name: %s", signer.Name)
 	return Success
 }
 
@@ -311,7 +562,7 @@ func ImportAccountFromPrivateKey(privateKey *C.uint8_t, keyName *C.char) C.int {
 		Key: privKeyBytes,
 	}
 
-	logrus.Info("Priv Pub String", privKey.PubKey().String())
+	logrus.Info("Pubkey String: ", privKey.PubKey().String())
 	// Create a keyring
 	signer, err := gonibi.CreateSignerFromPrivKey(&privKey, C.GoString(keyName))
 	logrus.Info("Import New Account Success", signer.String())
@@ -363,7 +614,13 @@ func GetAccountByKeyName(keyName *C.char) *C.KeyInfo {
 		return nil
 	}
 
-	logrus.Debug("Account find: ", keyInfo)
+	logrus.Debug("Account find: ")
+	addr, err := keyInfo.GetAddress()
+	if err != nil {
+		logrus.Error("GetAccountByKeyName Failed to get dddress: ", err)
+		return nil
+	}
+	logrus.Printf("Name: %s\nPubkey: %s\n address: %s", keyInfo.Name, keyInfo.PubKey, addr.String())
 	return convertKeyInfo(keyInfo)
 }
 
@@ -375,6 +632,7 @@ func GetAccountByAddress(addr *C.char) *C.KeyInfo {
 		logrus.Error("GetAccountByaddr Failed: ", err)
 		return nil
 	}
+	logrus.Printf("C address: %s, niburu address: %s", C.GoString(addr), address)
 	keyInfo, err := gosdk.Keyring.KeyByAddress(address)
 	if err != nil {
 		logrus.Error("GetAccountByaddr Failed: ", err)
@@ -430,7 +688,12 @@ func PrintListSigners() {
 	}
 
 	for _, signer := range signers {
-		logrus.Debug("Signer name: ", signer.Name, signer.GetType())
+
+		addr, err := signer.GetAddress()
+		if err != nil {
+			logrus.Error("GetAccountByKeyName Failed to get address: ", err)
+		}
+		logrus.Printf("Name: %s\nPubkey: %s\n address: %s", signer.Name, signer.PubKey, addr)
 	}
 }
 
@@ -445,4 +708,8 @@ func DeleteAccount(keyName *C.char, password *C.char) C.int {
 	}
 	PrintListSigners()
 	return Success
+}
+
+func TransferToken() {
+
 }
