@@ -1,0 +1,852 @@
+{
+	"folders": [
+		{
+			"name": "NibiruUnreal",
+			"path": "."
+		},
+		{
+			"name": "UE5",
+			"path": "/Users/Shared/Epic Games/UE_5.3"
+		}
+	],
+	"settings": {
+		"typescript.tsc.autoDetect": "off",
+		"npm.autoDetect": "off"
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools",
+			"ms-dotnettools.csharp",
+			"vadimcn.vscode-lldb",
+			"ms-vscode.mono-debug",
+			"dfarley1.file-picker"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "NibiruUnreal Mac Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Debug",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Debug",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal Mac Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Debug",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"DebugGame",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"DebugGame",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal Mac DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"DebugGame",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Development",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Development",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal Mac Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Development",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Test Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Test",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Test Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Test",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal Mac Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Test Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Test",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Shipping Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Shipping",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Shipping Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Shipping",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal Mac Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal Mac Shipping Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"Mac",
+					"Shipping",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Debug",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Debug",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal IOS Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Debug",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"DebugGame",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"DebugGame",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal IOS DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"DebugGame",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Development",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Development",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal IOS Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Development",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Test Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Test",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Test Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Test",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal IOS Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Test Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Test",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Shipping Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Shipping",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Shipping Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Shipping",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnreal IOS Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnreal IOS Shipping Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnreal",
+					"IOS",
+					"Shipping",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnrealEditor Mac Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnrealEditor",
+					"Mac",
+					"Debug",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnrealEditor Mac Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnrealEditor",
+					"Mac",
+					"Debug",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnrealEditor Mac Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnrealEditor Mac Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnrealEditor",
+					"Mac",
+					"Debug",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnrealEditor Mac DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnrealEditor",
+					"Mac",
+					"DebugGame",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnrealEditor Mac DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnrealEditor",
+					"Mac",
+					"DebugGame",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnrealEditor Mac DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnrealEditor Mac DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnrealEditor",
+					"Mac",
+					"DebugGame",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnrealEditor Mac Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnrealEditor",
+					"Mac",
+					"Development",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnrealEditor Mac Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnrealEditor",
+					"Mac",
+					"Development",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"NibiruUnrealEditor Mac Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			},
+			{
+				"label": "NibiruUnrealEditor Mac Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
+				"args": [
+					"NibiruUnrealEditor",
+					"Mac",
+					"Development",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				}
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch NibiruUnreal (Debug)",
+				"request": "launch",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Debug.app/Contents/MacOS/UnrealGame-Mac-Debug",
+				"preLaunchTask": "NibiruUnreal Mac Debug Build",
+				"args": [
+				],
+				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"type": "lldb"
+			},
+			{
+				"name": "Launch NibiruUnreal (DebugGame)",
+				"request": "launch",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-DebugGame.app/Contents/MacOS/UnrealGame-Mac-DebugGame",
+				"preLaunchTask": "NibiruUnreal Mac DebugGame Build",
+				"args": [
+				],
+				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"type": "lldb"
+			},
+			{
+				"name": "Launch NibiruUnreal (Development)",
+				"request": "launch",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame.app/Contents/MacOS/UnrealGame",
+				"preLaunchTask": "NibiruUnreal Mac Development Build",
+				"args": [
+				],
+				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"type": "lldb"
+			},
+			{
+				"name": "Launch NibiruUnreal (Test)",
+				"request": "launch",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Test.app/Contents/MacOS/UnrealGame-Mac-Test",
+				"preLaunchTask": "NibiruUnreal Mac Test Build",
+				"args": [
+				],
+				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"type": "lldb"
+			},
+			{
+				"name": "Launch NibiruUnreal (Shipping)",
+				"request": "launch",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Shipping.app/Contents/MacOS/UnrealGame-Mac-Shipping",
+				"preLaunchTask": "NibiruUnreal Mac Shipping Build",
+				"args": [
+				],
+				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"type": "lldb"
+			},
+			{
+				"name": "Launch NibiruUnrealEditor (Debug)",
+				"request": "launch",
+				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Binaries/Mac/UnrealEditor-Mac-Debug.app/Contents/MacOS/UnrealEditor-Mac-Debug",
+				"preLaunchTask": "NibiruUnrealEditor Mac Debug Build",
+				"args": [
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
+				],
+				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"type": "lldb"
+			},
+			{
+				"name": "Launch NibiruUnrealEditor (DebugGame)",
+				"request": "launch",
+				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Binaries/Mac/UnrealEditor-Mac-DebugGame.app/Contents/MacOS/UnrealEditor-Mac-DebugGame",
+				"preLaunchTask": "NibiruUnrealEditor Mac DebugGame Build",
+				"args": [
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
+				],
+				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"type": "lldb"
+			},
+			{
+				"name": "Launch NibiruUnrealEditor (Development)",
+				"request": "launch",
+				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Binaries/Mac/UnrealEditor.app/Contents/MacOS/UnrealEditor",
+				"preLaunchTask": "NibiruUnrealEditor Mac Development Build",
+				"args": [
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
+				],
+				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"type": "lldb"
+			},
+			{
+				"name": "Generate Project Files",
+				"type": "coreclr",
+				"request": "launch",
+				"preLaunchTask": "UnrealBuildTool Mac Development Build",
+				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Build/BatchFiles/RunUBT.bat",
+				"args": [
+					"-projectfiles",
+					"-vscode",
+					"-project=/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-game",
+					"-engine",
+					"-dotnet"
+				],
+				"console": "internalConsole",
+				"internalConsoleOptions": "openOnSessionStart",
+				"stopAtEntry": false,
+				"cwd": "/Users/Shared/Epic Games/UE_5.3"
+			}
+		]
+	}
+}
