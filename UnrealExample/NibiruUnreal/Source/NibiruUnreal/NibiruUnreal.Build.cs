@@ -12,16 +12,21 @@ public class NibiruUnreal : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
-		string destinationDirectory = Target.ProjectFile.Directory.FullName;
-		PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../") });
-		PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../libs/") });
-		PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../libs/calc") });
-		PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../libs/cmdctx") });
-		// PublicAdditionalLibraries.Add(Path.Combine(destinationDirectory, "unreal_nibi_sdk.so"));
-		PublicIncludePaths.AddRange(new string[] { "/usr/local/include/" });
+		// string destinationDirectory = Target.ProjectFile.Directory.FullName;
+		// PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../") });
+		// PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../libs/") });
+		// PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../libs/calc") });
+		// PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../libs/cmdctx") });
+		// PublicIncludePaths.AddRange(new string[] { destinationDirectory });
+		// Add the directory to the runtime search paths
+		// PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "../../unreal_nibi_sdk.dylib"));
+		// RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../unreal_nibi_sdk.dylib"));
+
+		//PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "../../unreal_nibi_sdk.dylib"));
+
 		//bUseRTTI = true;
-		bEnableUndefinedIdentifierWarnings = false;
-		CppStandard = CppStandardVersion.Cpp17;
+		// bEnableUndefinedIdentifierWarnings = false;
+		// CppStandard = CppStandardVersion.Cpp17;
 
 	}
 }
