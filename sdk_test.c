@@ -96,19 +96,26 @@ int main()
     //     return 1;
     // }
 
-    BaseAccount *baseAcc = QueryAccount(address);
-    if (baseAcc != NULL)
+    int testTx = TestTransferToken();
+    if (testTx != 0)
     {
-        printf("User coins count: %lu\n", baseAcc->Coins->Length);
-        for (int i = 0; i < baseAcc->Coins->Length; i++)
-        {
-            printf("%d, %s coins have %llu\n", i + 1, baseAcc->Coins->Array[i].Denom, baseAcc->Coins->Array[i].Amount);
-        }
-    }
-    else
-    {
-        printf("\n Err: can't get base account");
+        printf("Failed to Test transfer\n");
+        return 1;
     }
 
-    return 0;
+    // BaseAccount *baseAcc = QueryAccount(address);
+    // if (baseAcc != NULL)
+    // {
+    //     printf("User coins count: %lu\n", baseAcc->Coins->Length);
+    //     for (int i = 0; i < baseAcc->Coins->Length; i++)
+    //     {
+    //         printf("%d, %s coins have %llu\n", i + 1, baseAcc->Coins->Array[i].Denom, baseAcc->Coins->Array[i].Amount);
+    //     }
+    // }
+    // else
+    // {
+    //     printf("\n Err: can't get base account");
+    // }
+
+    // return 0;
 }

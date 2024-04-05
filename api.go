@@ -44,7 +44,7 @@ typedef struct {
 import "C"
 import (
 	"context"
-	"fmt"
+	"errors"
 	"unsafe"
 
 	"github.com/Unique-Divine/gonibi"
@@ -52,10 +52,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	aKeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	keeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/go-bip39"
 	"github.com/sirupsen/logrus"
 )
@@ -64,6 +62,38 @@ func main() {
 
 }
 
+type NetworkInfo struct {
+	GrpcEndpoint      string
+	LcdEndpoint       string
+	TmRpcEndpoint     string
+	WebsocketEndpoint string
+	ChainID           string
+}
+
+var (
+	LocalNetworkInfo = NetworkInfo{
+		GrpcEndpoint:      "localhost:9090",
+		LcdEndpoint:       "http://localhost:1317",
+		TmRpcEndpoint:     "http://localhost:26657",
+		WebsocketEndpoint: "ws://localhost:26657/websocket",
+		ChainID:           "nibiru-localnet-0",
+	}
+	TestNetworkInfo = NetworkInfo{
+		GrpcEndpoint:      "localhost:9090",
+		LcdEndpoint:       "http://localhost:11317",
+		TmRpcEndpoint:     "https://rpc.testnet-1.nibiru.fi:443",
+		WebsocketEndpoint: "ws://localhost:26657/websocket",
+		ChainID:           "nibiru-testnet-1",
+	}
+	MainNetworkInfo = NetworkInfo{
+		GrpcEndpoint:      "localhost:9090",
+		LcdEndpoint:       "http://localhost:1317",
+		TmRpcEndpoint:     "https://rpc.nibiru.fi:443",
+		WebsocketEndpoint: "ws://localhost:26657/websocket",
+		ChainID:           "cataclysm-1",
+	}
+)
+
 type UserAccount struct {
 	KeyInfo  keyring.Record
 	Password string
@@ -71,55 +101,37 @@ type UserAccount struct {
 
 var gosdk gonibi.NibiruClient
 var sdkCtx sdk.Context
-var accountKeeper aKeeper.AccountKeeper
+var authClient authtypes.QueryClient
+var bankClient banktypes.QueryClient
+var networkInfo NetworkInfo
 
-const (
-	holder     = "holder"
-	multiPerm  = "multiple permissions account"
-	randomPerm = "random permission"
-)
-
-var (
-	multiPermAcc  = types.NewEmptyModuleAccount(multiPerm, types.Burner, types.Minter, types.Staking)
-	randomPermAcc = types.NewEmptyModuleAccount(randomPerm, "random")
-)
-
-func initAccountKeeper() {
-	key := sdk.NewKVStoreKey(authtypes.StoreKey)
-
-	maccPerms := map[string][]string{
-		"fee_collector":          nil,
-		"mint":                   {"minter"},
-		"bonded_tokens_pool":     {"burner", "staking"},
-		"not_bonded_tokens_pool": {"burner", "staking"},
-		multiPerm:                {"burner", "minter", "staking"},
-		randomPerm:               {"random"},
+func InitClients() error {
+	authClient = authtypes.NewQueryClient(gosdk.Querier.ClientConn)
+	bankClient = banktypes.NewQueryClient(gosdk.Querier.ClientConn)
+	if authClient == nil || bankClient == nil {
+		return errors.New("can't init client")
 	}
-	accountKeeper = aKeeper.NewAccountKeeper(
-		gosdk.EncCfg.Marshaler,
-		key,
-		types.ProtoBaseAccount,
-		maccPerms,
-		"cosmos",
-		types.NewModuleAddress("gov").String(),
-	)
+	return nil
 }
 
 func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
+	networkInfo = TestNetworkInfo
 
-	grpcConn, err := gonibi.GetGRPCConnection(gonibi.DefaultNetworkInfo.GrpcEndpoint, true, 2)
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
 	if err != nil {
 		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
 	}
 
-	gosdk, err = gonibi.NewNibiruClient("nibiru-localnet-0", grpcConn, gonibi.DefaultNetworkInfo.TmRpcEndpoint)
+	gosdk, err = gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
 	if err != nil {
 		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
 	}
 
-	sdkCtx = sdk.Context{}
+	if err := InitClients(); err != nil {
+		logrus.Println("[ERR] ", err)
+	}
 	logrus.Println("[init] Nibiru client initialized")
 }
 
@@ -134,79 +146,56 @@ func GetAccountInfo(
 	address string,
 ) (account authtypes.AccountI, err error) {
 
-	addr, err := sdk.AccAddressFromBech32(address)
+	acc, err := authClient.Account(context.Background(), &authtypes.QueryAccountRequest{
+		Address: address,
+	})
 	if err != nil {
-		logrus.Error("Can't get account address", err)
-		return account, err
+		return nil, err
 	}
-	baseAcc := accountKeeper.GetAccount(sdkCtx, addr)
-
-	// register auth interface
-	logrus.Info("Address: ", baseAcc.GetAddress().String())
-
-	return baseAcc, err
+	var accountI authtypes.AccountI
+	gosdk.EncCfg.InterfaceRegistry.UnpackAny(acc.Account, &accountI)
+	return accountI, nil
 }
 
-func GetListAccountInfo() (err error) {
+func GetListAccountInfo() (accouns []authtypes.AccountI, err error) {
 
 	queryClient := authtypes.NewQueryClient(gosdk.Querier.ClientConn)
 	resp, err := queryClient.Accounts(context.Background(), &authtypes.QueryAccountsRequest{})
 	if err != nil {
-		return err
+		return accouns, err
 	}
 	// register auth interface
-
+	var accounts []authtypes.AccountI
 	for _, v := range resp.Accounts {
 		var acc authtypes.AccountI
 		gosdk.EncCfg.InterfaceRegistry.UnpackAny(v, &acc)
 		if v != nil {
-			logrus.Info(acc.GetAddress().String())
+			accounts = append(accounts, acc)
 		}
 	}
-	return nil
+	return accounts, nil
 }
 
-// func GetListAccountInfo() (err error) {
-
-// 	var accountKeeper aKeeper.AccountKeeper
-// 	baseAcc := accountKeeper.GetAllAccounts(sdkCtx)
-
-// 	// register auth interface
-// 	for _, v := range baseAcc {
-// 		if v == nil {
-// 			continue
-// 		}
-// 		logrus.Info("Address: ", v.GetAddress().String())
-// 	}
-
-// 	return err
-// }
-
 func GetAccountCoins(
-	address *C.char,
+	address string,
 ) (sdk.Coins, error) {
-	addr, err := sdk.AccAddressFromBech32(C.GoString(address))
+
+	resp, err := bankClient.AllBalances(context.Background(), &banktypes.QueryAllBalancesRequest{
+		Address: address,
+	})
 	if err != nil {
-		logrus.Error("Can't get account address")
+		logrus.Error("Can't get account coin")
 		return nil, err
 	}
 
-	ctx := sdk.Context{}
-	var viewKeeper keeper.BaseViewKeeper
-	if err := viewKeeper.ValidateBalance(ctx, addr); err != nil {
-		fmt.Printf("Error validating balance: %s\n", err.Error())
-	}
-
-	coins := viewKeeper.GetAllBalances(ctx, addr)
-
-	return coins, nil
+	return resp.Balances, nil
 }
 
 //export QueryAccount
 func QueryAccount(address *C.char) *C.BaseAccount {
 	logrus.Debug("Call QueryAccount")
 
-	if err := GetListAccountInfo(); err != nil {
+	if _, err := GetListAccountInfo(); err != nil {
 		logrus.Info(err)
 	}
 
@@ -239,7 +228,7 @@ func QueryAccount(address *C.char) *C.BaseAccount {
 	}
 	// get account coin
 
-	accountCoins, err := GetAccountCoins(address)
+	accountCoins, err := GetAccountCoins(addr.String())
 	if err != nil {
 		logrus.Error("Can't get account coins")
 		return nil
@@ -301,13 +290,13 @@ func QueryAccount(address *C.char) *C.BaseAccount {
 //export NewNibiruClientDefault
 func NewNibiruClientDefault() C.int {
 	logrus.Println("Call [NewNibiruClientDefault]") // Use logrus instead of fmt.Println
-	grpcConn, err := gonibi.GetGRPCConnection(gonibi.DefaultNetworkInfo.GrpcEndpoint, true, 2)
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
 	if err != nil {
 		logrus.Println("[NewNibiruClientDefault] GetGRPCConnection error: " + err.Error())
 		return Fail
 	}
 
-	gosdk, err := gonibi.NewNibiruClient("nibiru-localnet-0", grpcConn, gonibi.DefaultNetworkInfo.TmRpcEndpoint)
+	gosdk, err := gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
 	if err != nil {
 		logrus.Println("[NewNibiruClientDefault] Connect to network error: " + err.Error())
 		return Fail
@@ -413,7 +402,6 @@ func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
 		logrus.Debug("Failed to create new account", err)
 		return Fail
 	}
-
 	logrus.Printf("Account created: %s, %s\n", record.Name, record.PubKey.String())
 	addr, err := record.GetAddress()
 	if err != nil {
@@ -421,14 +409,6 @@ func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
 	}
 
 	logrus.Info("Account Address: ", addr)
-	GetListAccountInfo()
-	newAccounts, err := gosdk.Keyring.MigrateAll()
-	logrus.Println("New AACS:", newAccounts)
-	GetListAccountInfo()
-	// baseAcc, err := NewBaseAccount(*record)
-	// if err != nil || baseAcc == nil {
-	// 	logrus.Debug("Failed to create new base account", err)
-	// }
 	return Success
 }
 
@@ -448,10 +428,6 @@ func NewBaseAccount(keyInfo keyring.Record) (account *authtypes.BaseAccount, err
 	var accNumber uint64 = 0
 	var accSequence uint64 = 0
 	acc := authtypes.NewBaseAccount(keyAddr, pubKey, accNumber, accSequence)
-	accI := accountKeeper.NewAccount(sdkCtx, acc)
-	if accI != nil {
-		logrus.Info("Account Address: ", accI.GetAddress().String())
-	}
 
 	return acc, nil
 }
@@ -710,6 +686,87 @@ func DeleteAccount(keyName *C.char, password *C.char) C.int {
 	return Success
 }
 
-func TransferToken() {
+//export TestTransferToken
+func TestTransferToken() C.int {
+	accounts, err := GetListAccountInfo()
+	if err != nil {
+		return Fail
+	}
+	addr1 := accounts[1].GetAddress()
+	acc1Coin, err := GetAccountCoins(addr1.String())
+	if err != nil {
+		return Fail
+	}
+	logrus.Info(addr1.String(), " ", acc1Coin.Denoms())
+	addr2 := accounts[2].GetAddress()
+	acc2Coin, err := GetAccountCoins(addr2.String())
+	if err != nil {
+		return Fail
+	}
+	logrus.Info(addr2.String(), " ", acc2Coin.Denoms(), acc2Coin.AmountOf("unibi"))
+	denomStr := "unibi"
 
+	coin := sdk.NewCoins(sdk.NewInt64Coin(denomStr, 100))
+
+	// Create a MsgSend message to transfer tokens
+	msgSend := banktypes.NewMsgSend(addr1, addr2, coin)
+
+	// Broadcast the transaction to the blockchain network
+	txRsp, err := gosdk.BroadcastMsgs(addr1, msgSend)
+	if err != nil || txRsp == nil {
+		logrus.Error("Transfer Error", err)
+		return Fail
+	}
+
+	PrintAccount()
+	return Success
+}
+func PrintAccount() error {
+	accounts, err := GetListAccountInfo()
+	if err != nil {
+		return err
+	}
+	addr1 := accounts[1].GetAddress()
+	acc1Coin, err := GetAccountCoins(addr1.String())
+	if err != nil {
+		return err
+	}
+	logrus.Info(addr1.String(), " ", acc1Coin.String())
+	addr2 := accounts[2].GetAddress()
+	acc2Coin, err := GetAccountCoins(addr2.String())
+	if err != nil {
+		return err
+	}
+	logrus.Info(addr2.String(), " ", acc2Coin.Denoms(), acc2Coin.AmountOf("unibi"))
+	return nil
+}
+
+func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) (*sdk.TxResponse, error) {
+	// Convert C strings to Go strings
+	fromStr := C.GoString(fromAddress)
+	toStr := C.GoString(toAddress)
+	denomStr := C.GoString(denom)
+
+	// Get the sender's address
+	from, err := sdk.AccAddressFromBech32(fromStr)
+	if err != nil {
+		logrus.Error("Can't get fromAddress", err)
+		return nil, err
+	}
+
+	// Get the recipient's address
+	to, err := sdk.AccAddressFromBech32(toStr)
+	if err != nil {
+		logrus.Error("Can't get toAddress", err)
+		return nil, err
+	}
+
+	// Create a coin with the specified denomination and amount
+	coin := sdk.NewCoins(sdk.NewInt64Coin(denomStr, int64(amount)))
+
+	// Create a MsgSend message to transfer tokens
+	msgSend := banktypes.NewMsgSend(from, to, coin)
+
+	// Broadcast the transaction to the blockchain network
+	return gosdk.BroadcastMsgs(from, msgSend)
 }
