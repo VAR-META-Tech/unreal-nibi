@@ -13,21 +13,22 @@ int main()
         return 1;
     }
 
-    char *keyName = "name";
+    char *keyName = "Mykey3";
     // Create new wallet
     // Generate Menomonic
     char *prases = GenerateRecoveryPhrase();
+    char *adminPhases = "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host";
 
     // Create key(private,public =>signner) from menemonic
     char *passPrares = "pass";
-    int createAccount = CreateAccount(keyName, prases, passPrares);
+    int createAccount = CreateAccount(keyName, adminPhases, passPrares);
     if (createAccount != 0)
     {
         printf("Failed to create account\n");
         return 1;
     }
 
-    u_int8_t *privkey = GetPrivKeyFromMnemonic(prases, keyName);
+    u_int8_t *privkey = GetPrivKeyFromMnemonic(adminPhases, keyName);
     if (privkey == NULL)
     {
         printf("Failed to get private key\n");
@@ -49,7 +50,7 @@ int main()
         printf("Failed to get Address key\n");
         return 1;
     }
-    printf("Private Address: %s\n", address);
+    printf("Address: %s\n", address);
 
     // int importP = ImportAccountFromPrivateKey(privkey, keyName);
 
@@ -83,11 +84,11 @@ int main()
     //     printf("KeyInfo: %s\n", keyInfo->Name);
     // }
 
-    KeyInfo *KeyInfo2 = GetAccountByAddress(address);
-    if (KeyInfo2 != NULL)
-    {
-        printf("KeyInfo Address: %s\n", KeyInfo2->Address);
-    }
+    // KeyInfo *KeyInfo2 = GetAccountByAddress(address);
+    // if (KeyInfo2 != NULL)
+    // {
+    //     printf("KeyInfo Address: %s\n", KeyInfo2->Address);
+    // }
 
     // int deleteAccount = DeleteAccount(keyName, passPrares);
     // if (deleteAccount != 0)
@@ -96,14 +97,14 @@ int main()
     //     return 1;
     // }
 
+    BaseAccount *baseAcc = QueryAccount(address);
+
     int testTx = TestTransferToken();
     if (testTx != 0)
     {
         printf("Failed to Test transfer\n");
         return 1;
     }
-
-    // BaseAccount *baseAcc = QueryAccount(address);
     // if (baseAcc != NULL)
     // {
     //     printf("User coins count: %lu\n", baseAcc->Coins->Length);

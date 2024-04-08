@@ -86,11 +86,11 @@ var (
 		ChainID:           "nibiru-devnet-2",
 	}
 	TestNetworkInfo = NetworkInfo{
-		GrpcEndpoint:      "tcp://grpc.itn-2.nibiru.fi:443",
-		LcdEndpoint:       "https://lcd.itn-2.nibiru.fi",
-		TmRpcEndpoint:     "https://rpc.itn-2.nibiru.fi",
-		WebsocketEndpoint: "wss://rpc.itn-2.nibiru.fi/websocket",
-		ChainID:           "nibiru-itn-2",
+		GrpcEndpoint:      "tcp://grpc.testnet-1.nibiru.fi:9090",
+		LcdEndpoint:       "https://lcd.testnet-1.nibiru.fi",
+		TmRpcEndpoint:     "https://rpc.testnet-1.nibiru.fi::443",
+		WebsocketEndpoint: "wss://rpc.testnet-1.nibiru.fi/websocket",
+		ChainID:           "nibiru-testnet-1",
 	}
 	MainNetworkInfo = NetworkInfo{
 		GrpcEndpoint:      "localhost:9090",
@@ -124,7 +124,7 @@ func InitClients() error {
 func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	networkInfo = TestNetworkInfo
+	networkInfo = LocalNetworkInfo
 
 	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
 	if err != nil {
@@ -186,15 +186,16 @@ func GetListAccountInfo() (accouns []authtypes.AccountI, err error) {
 func GetAccountCoins(
 	address string,
 ) (sdk.Coins, error) {
-
+	logrus.Debug("Call GetAccountCoins")
 	resp, err := bankClient.AllBalances(context.Background(), &banktypes.QueryAllBalancesRequest{
 		Address: address,
 	})
+	logrus.Debug(resp.String())
 	if err != nil {
 		logrus.Error("Can't get account coin")
 		return nil, err
 	}
-
+	logrus.Debug("End Call GetAccountCoins")
 	return resp.Balances, nil
 }
 
@@ -401,7 +402,7 @@ func convertKeyInfo(key *keyring.Record) *C.KeyInfo {
 
 //export CreateAccount
 func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
-	logrus.Debug("Call Creating Account")
+	logrus.Debug("Call Creating Account keyname:", C.GoString(keyName), "mnemonic:", C.GoString(mnemonic))
 	algo := hd.Secp256k1
 	// Create a keyring
 	record, err := gosdk.Keyring.NewAccount(C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase), sdk.GetConfig().GetFullBIP44Path(), algo)
@@ -410,12 +411,6 @@ func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
 		return Fail
 	}
 	logrus.Printf("Account created: %s, %s\n", record.Name, record.PubKey.String())
-	addr, err := record.GetAddress()
-	if err != nil {
-		return 1
-	}
-
-	logrus.Info("Account Address: ", addr)
 	return Success
 }
 
@@ -695,31 +690,33 @@ func DeleteAccount(keyName *C.char, password *C.char) C.int {
 
 //export TestTransferToken
 func TestTransferToken() C.int {
-	accounts, err := GetListAccountInfo()
+	// accounts, err := GetListAccountInfo()
+	// if err != nil {
+	// 	return Fail
+	// }
+	addr1 := "nibi1zaavvzxez0elundtn32qnk9lkm8kmcsz44g7xl"
+	acc1Coin, err := GetAccountCoins(addr1)
 	if err != nil {
 		return Fail
 	}
-	addr1 := accounts[1].GetAddress()
-	acc1Coin, err := GetAccountCoins(addr1.String())
+	logrus.Info(addr1, " ", acc1Coin.Denoms())
+	addr2 := "nibi1tq2ynj3x3k7z09r2z6qqndvpmk57ffr2ma39nh"
+	acc2Coin, err := GetAccountCoins(addr2)
 	if err != nil {
 		return Fail
 	}
-	logrus.Info(addr1.String(), " ", acc1Coin.Denoms())
-	addr2 := accounts[2].GetAddress()
-	acc2Coin, err := GetAccountCoins(addr2.String())
-	if err != nil {
-		return Fail
-	}
-	logrus.Info(addr2.String(), " ", acc2Coin.Denoms(), acc2Coin.AmountOf("unibi"))
+	logrus.Info(addr2, " ", acc2Coin.Denoms(), acc2Coin.AmountOf("unibi"))
 	denomStr := "unibi"
 
 	coin := sdk.NewCoins(sdk.NewInt64Coin(denomStr, 100))
 
 	// Create a MsgSend message to transfer tokens
-	msgSend := banktypes.NewMsgSend(addr1, addr2, coin)
+	rawaddr1, _ := sdk.AccAddressFromBech32(addr1)
+	rawaddr2, _ := sdk.AccAddressFromBech32(addr2)
+	msgSend := banktypes.NewMsgSend(rawaddr1, rawaddr2, coin)
 
 	// Broadcast the transaction to the blockchain network
-	txRsp, err := gosdk.BroadcastMsgs(addr1, msgSend)
+	txRsp, err := gosdk.BroadcastMsgs(rawaddr1, msgSend)
 	if err != nil || txRsp == nil {
 		logrus.Error("Transfer Error", err)
 		return Fail
