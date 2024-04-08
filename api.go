@@ -78,12 +78,19 @@ var (
 		WebsocketEndpoint: "ws://localhost:26657/websocket",
 		ChainID:           "nibiru-localnet-0",
 	}
+	DevNetworkInfo = NetworkInfo{
+		GrpcEndpoint:      "tcp://grpc.devnet-2.nibiru.fi:443",
+		LcdEndpoint:       "http://localhost:1317",
+		TmRpcEndpoint:     "https://rpc.devnet-2.nibiru.fi:443",
+		WebsocketEndpoint: "wss://rpc.devnet-2.nibiru.fi/websocket",
+		ChainID:           "nibiru-devnet-2",
+	}
 	TestNetworkInfo = NetworkInfo{
-		GrpcEndpoint:      "localhost:9090",
-		LcdEndpoint:       "http://localhost:11317",
-		TmRpcEndpoint:     "https://rpc.testnet-1.nibiru.fi:443",
-		WebsocketEndpoint: "ws://localhost:26657/websocket",
-		ChainID:           "nibiru-testnet-1",
+		GrpcEndpoint:      "tcp://grpc.itn-2.nibiru.fi:443",
+		LcdEndpoint:       "https://lcd.itn-2.nibiru.fi",
+		TmRpcEndpoint:     "https://rpc.itn-2.nibiru.fi",
+		WebsocketEndpoint: "wss://rpc.itn-2.nibiru.fi/websocket",
+		ChainID:           "nibiru-itn-2",
 	}
 	MainNetworkInfo = NetworkInfo{
 		GrpcEndpoint:      "localhost:9090",
