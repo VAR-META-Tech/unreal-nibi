@@ -13,6 +13,11 @@ int main()
         return 1;
     }
 
+    // "local" | "dev" | "test" | "main"
+    char *networkType = "test";
+
+    int switchNetwork = SwitchNetwork(networkType);
+
     char *keyName = "name";
     // Create new wallet
     // Generate Menomonic
@@ -49,7 +54,6 @@ int main()
         printf("Failed to get Address key\n");
         return 1;
     }
-    printf("Private Address: %s\n", address);
 
     // int importP = ImportAccountFromPrivateKey(privkey, keyName);
 
