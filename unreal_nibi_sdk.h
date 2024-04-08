@@ -117,6 +117,7 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
+extern int SwitchNetwork(char* network);
 extern BaseAccount* QueryAccount(char* address);
 extern int NewNibiruClientDefault();
 extern int NewNibiruClient(char* chainId, char* grpcEndpoint, char* rpcEndpoint);

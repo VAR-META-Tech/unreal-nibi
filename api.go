@@ -142,6 +142,43 @@ func init() {
 	logrus.Println("[init] Nibiru client initialized")
 }
 
+//export SwitchNetwork
+func SwitchNetwork(network *C.char) C.int {
+	logrus.Info("Call SwitchNetwork")
+	networkStr := C.GoString(network)
+	switch networkStr {
+	case "local":
+		networkInfo = LocalNetworkInfo
+	case "dev":
+		networkInfo = DevNetworkInfo
+	case "test":
+		networkInfo = TestNetworkInfo
+	case "main":
+		networkInfo = MainNetworkInfo
+	default:
+		networkInfo = TestNetworkInfo
+	}
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
+	if err != nil {
+		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		return Fail
+	}
+
+	gosdk, err = gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
+	if err != nil {
+		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		return Fail
+	}
+
+	logrus.Info("Switch to network: ", networkStr)
+
+	if err := InitClients(); err != nil {
+		logrus.Error("Init client err: ", err)
+		return Fail
+	}
+	return Success
+}
+
 const (
 	Success = 0
 	Fail    = 1
@@ -334,13 +371,16 @@ func NewNibiruClient(chainId *C.char, grpcEndpoint *C.char, rpcEndpoint *C.char)
 
 //export GenerateRecoveryPhrase
 func GenerateRecoveryPhrase() *C.char {
+	logrus.Info("Call GenerateRecoveryPhrase")
 	const mnemonicEntropySize = 256
 	entropySeed, err := bip39.NewEntropy(mnemonicEntropySize)
 	if err != nil {
+		logrus.Error("Can't generate recovery phrase")
 		return C.CString("")
 	}
 	phrase, err := bip39.NewMnemonic(entropySeed[:])
 	if err != nil {
+		logrus.Error("Can't generate recovery phrase")
 		return C.CString("")
 	}
 	return C.CString(phrase)
@@ -402,7 +442,7 @@ func convertKeyInfo(key *keyring.Record) *C.KeyInfo {
 
 //export CreateAccount
 func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
-	logrus.Debug("Call Creating Account keyname:", C.GoString(keyName), "mnemonic:", C.GoString(mnemonic))
+	logrus.Debug("Call CreateAccount")
 	algo := hd.Secp256k1
 	// Create a keyring
 	record, err := gosdk.Keyring.NewAccount(C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase), sdk.GetConfig().GetFullBIP44Path(), algo)
@@ -492,12 +532,12 @@ func GetAddressFromKeyName(keyName *C.char) *C.char {
 	logrus.Println("Call GetAddressFromKeyName")
 	keyInfo, err := gosdk.Keyring.Key(C.GoString(keyName))
 	if err != nil {
-		logrus.Debug("Failed to get address", err)
+		logrus.Error("Failed to get address", err)
 		return nil
 	}
 	addr, err := keyInfo.GetAddress()
 	if err != nil {
-		logrus.Debug("Failed to get address", err)
+		logrus.Error("Failed to get address", err)
 		return nil
 	}
 
@@ -528,25 +568,23 @@ func ImportAccountFromMnemoic(mnemonic *C.char, keyName *C.char) C.int {
 
 //export ImportAccountFromPrivateKey
 func ImportAccountFromPrivateKey(privateKey *C.uint8_t, keyName *C.char) C.int {
-	logrus.Debug("Import Account")
+	logrus.Debug("Call ImportAccountFromPrivateKey")
 	// Decode the private key string from hex
 	privKeyBytes := cUint8ToGoSlice(privateKey)
 	if privKeyBytes == nil {
-		logrus.Debug("Can not get private key")
+		logrus.Error("Can not get private key")
 	}
 
 	// Create a PrivKey instance and assign the decoded bytes to its Key field
 	privKey := secp256k1.PrivKey{
 		Key: privKeyBytes,
 	}
-
-	logrus.Info("Pubkey String: ", privKey.PubKey().String())
 	// Create a keyring
 	signer, err := gonibi.CreateSignerFromPrivKey(&privKey, C.GoString(keyName))
-	logrus.Info("Import New Account Success", signer.String())
 	if err != nil {
 		return Fail
 	}
+	logrus.Info("Success to import account: ", signer.Name)
 	return Success
 }
 
@@ -622,7 +660,7 @@ func GetAccountByAddress(addr *C.char) *C.KeyInfo {
 
 //export HasKeyByName
 func HasKeyByName(name *C.char) C.int {
-	logrus.Debug("HasKeyByName called")
+	logrus.Debug("Call HasKeyByName")
 	has, err := gosdk.Keyring.Key(C.GoString(name))
 	if err != nil {
 		logrus.Error("HasKeyByName Fail: ", err)
@@ -638,7 +676,7 @@ func HasKeyByName(name *C.char) C.int {
 
 //export HasKeyByAddress
 func HasKeyByAddress(addr *C.char, len C.int) C.int {
-	logrus.Debug("HasKeyByAddress called")
+	logrus.Debug("Call HasKeyByAddres")
 	address, err := sdk.AccAddressFromBech32(C.GoString(addr))
 	if err != nil {
 		return Fail
@@ -651,7 +689,7 @@ func HasKeyByAddress(addr *C.char, len C.int) C.int {
 	}
 
 	if a != nil {
-		logrus.Debug("keyInfor ", a.String())
+		logrus.Debug("Key Name: ", a.Name)
 		return Success
 	} else {
 		return Fail
@@ -697,12 +735,14 @@ func TestTransferToken() C.int {
 	addr1 := "nibi1zaavvzxez0elundtn32qnk9lkm8kmcsz44g7xl"
 	acc1Coin, err := GetAccountCoins(addr1)
 	if err != nil {
+		logrus.Error("Can't get list account", err)
 		return Fail
 	}
 	logrus.Info(addr1, " ", acc1Coin.Denoms())
 	addr2 := "nibi1tq2ynj3x3k7z09r2z6qqndvpmk57ffr2ma39nh"
 	acc2Coin, err := GetAccountCoins(addr2)
 	if err != nil {
+		logrus.Error("Can't get account coin", err)
 		return Fail
 	}
 	logrus.Info(addr2, " ", acc2Coin.Denoms(), acc2Coin.AmountOf("unibi"))
@@ -726,6 +766,7 @@ func TestTransferToken() C.int {
 	return Success
 }
 func PrintAccount() error {
+	logrus.Info("Call PrintAccount")
 	accounts, err := GetListAccountInfo()
 	if err != nil {
 		return err
@@ -746,6 +787,7 @@ func PrintAccount() error {
 }
 
 func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) (*sdk.TxResponse, error) {
+	logrus.Info("Call TransferToken")
 	// Convert C strings to Go strings
 	fromStr := C.GoString(fromAddress)
 	toStr := C.GoString(toAddress)
