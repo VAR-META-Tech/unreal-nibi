@@ -45,10 +45,10 @@ import "C"
 import (
 	"context"
 	"errors"
+	"fmt"
 	"unsafe"
 
 	"github.com/Unique-Divine/gonibi"
-	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -121,6 +121,15 @@ func InitClients() error {
 	return nil
 }
 
+func PrintPayload(funcName string, args ...interface{}) {
+	// Log the function name
+	logrus.WithField("", funcName).Info("\n\nCall function")
+
+	// Log the function parameters
+	for i, arg := range args {
+		logrus.WithFields(logrus.Fields{"arg": i, "value": fmt.Sprintf("%v", arg)}).Debug("Parameter")
+	}
+}
 func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
@@ -223,7 +232,7 @@ func GetListAccountInfo() (accouns []authtypes.AccountI, err error) {
 func GetAccountCoins(
 	address string,
 ) (sdk.Coins, error) {
-	logrus.Debug("Call GetAccountCoins")
+	PrintPayload("GetAccountCoins", address)
 	resp, err := bankClient.AllBalances(context.Background(), &banktypes.QueryAllBalancesRequest{
 		Address: address,
 	})
@@ -232,31 +241,44 @@ func GetAccountCoins(
 		logrus.Error("Can't get account coin")
 		return nil, err
 	}
-	logrus.Debug("End Call GetAccountCoins")
 	return resp.Balances, nil
+}
+func PrintBaseAccountInfo(addrs ...string) {
+	for _, addr := range addrs {
+		account, err := GetAccountInfo(addr)
+		if err != nil {
+			logrus.Error("Account not found: ", err)
+		} else {
+			accountCoin, err := GetAccountCoins(addr)
+			if err != nil {
+				logrus.Error("Account coin not found: ", err)
+			} else {
+				logrus.Info("Account Info Of Address: ", addr)
+				logrus.Info("Account Number: ", account.GetAccountNumber())
+				logrus.Info("Account Sequence: ", account.GetSequence())
+				logrus.Info("Account Denoms: ", accountCoin.Denoms())
+				logrus.Info("Account Coin: ", accountCoin.String())
+			}
+		}
+	}
 }
 
 //export QueryAccount
 func QueryAccount(address *C.char) *C.BaseAccount {
-	logrus.Debug("Call QueryAccount")
-
-	if _, err := GetListAccountInfo(); err != nil {
-		logrus.Info(err)
-	}
+	PrintPayload("QueryAccount", C.GoString(address))
 
 	addr, err := sdk.AccAddressFromBech32(C.GoString(address))
 	if err != nil {
 		logrus.Error("GetAccountByaddr Failed: ", err)
 		return nil
 	}
-	logrus.Info("QueryAccount ~ addr:", addr.String())
 	account, err := GetAccountInfo(C.GoString(address))
 	if err != nil {
 		logrus.Error("Account not found: ", err)
 		return nil
 	}
 
-	logrus.Info("QueryAccount ~ Account:", account)
+	logrus.Info("QueryAccount ~ Account:", account.String())
 	// Allocate memory for BaseAccount in C.
 	cAccount := (*C.BaseAccount)(C.malloc(C.sizeof_BaseAccount))
 	if cAccount == nil {
@@ -383,6 +405,7 @@ func GenerateRecoveryPhrase() *C.char {
 		logrus.Error("Can't generate recovery phrase")
 		return C.CString("")
 	}
+	logrus.Info("Return recovery phrase: ", phrase)
 	return C.CString(phrase)
 }
 
@@ -442,48 +465,42 @@ func convertKeyInfo(key *keyring.Record) *C.KeyInfo {
 
 //export CreateAccount
 func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
-	logrus.Debug("Call CreateAccount")
-	algo := hd.Secp256k1
-	// Create a keyring
-	record, err := gosdk.Keyring.NewAccount(C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase), sdk.GetConfig().GetFullBIP44Path(), algo)
+	PrintListSigners()
+	PrintPayload("CreateAccount", C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase))
+	// algo := hd.Secp256k1
+	// // Create a keyring
+	// record, err := gosdk.Keyring.NewAccount(C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase), sdk.GetConfig().GetFullBIP44Path(), algo)
+	// if err != nil {
+	// 	logrus.Debug("Failed to create new account", err)
+	// 	return Fail
+	// }
+	record, _, err := gonibi.CreateSigner(C.GoString(mnemonic), gosdk.Keyring, C.GoString(keyName))
 	if err != nil {
 		logrus.Debug("Failed to create new account", err)
 		return Fail
 	}
-	logrus.Printf("Account created: %s, %s\n", record.Name, record.PubKey.String())
+
+	// Add signer to keyring
+	// if err := gonibi.AddSignerToKeyring(gosdk.Keyring, privateKey, privateKey.PubKey().String()); err != nil {
+	// 	logrus.Error("Can't assing singer to keyring: ", err)
+	// 	return Fail
+	// }
+
+	addr, _ := record.GetAddress()
+	logrus.Printf("Account created with address: %s", addr.String())
 	return Success
-}
-
-func NewBaseAccount(keyInfo keyring.Record) (account *authtypes.BaseAccount, err error) {
-	logrus.Info("Call NewBaseAccount")
-	keyAddr, err := keyInfo.GetAddress()
-	logrus.Info("Account Address: ", keyAddr)
-	if err != nil {
-		logrus.Error("Can't get address: ", err)
-		return account, err
-	}
-	pubKey, err := keyInfo.GetPubKey()
-	if err != nil {
-		logrus.Error("Can't get pubkey: ", err)
-		return account, err
-	}
-	var accNumber uint64 = 0
-	var accSequence uint64 = 0
-	acc := authtypes.NewBaseAccount(keyAddr, pubKey, accNumber, accSequence)
-
-	return acc, nil
 }
 
 //export GetPrivKeyFromMnemonic
 func GetPrivKeyFromMnemonic(mnemoic *C.char, keyName *C.char) *C.uint8_t {
-	logrus.Debug("Call GetPrivKeyFromMnemonic")
+	PrintPayload("GetPrivKeyFromMnemonic", C.GoString(mnemoic), C.GoString(keyName))
 	kring := gosdk.Keyring
 	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
 	if err != nil {
 		logrus.Debug("Failed to get priv key", err)
 		return nil
 	}
-	logrus.Info("Address String", privKey.PubKey().Address())
+	logrus.Info("Address String", privKey.PubKey().Address().String())
 	return revertToCData(privKey.Bytes())
 }
 
@@ -529,7 +546,7 @@ func cUint8ToGoSlice(cData *C.uint8_t) []byte {
 
 //export GetAddressFromKeyName
 func GetAddressFromKeyName(keyName *C.char) *C.char {
-	logrus.Println("Call GetAddressFromKeyName")
+	PrintPayload("GetAddressFromKeyName", C.GoString(keyName))
 	keyInfo, err := gosdk.Keyring.Key(C.GoString(keyName))
 	if err != nil {
 		logrus.Error("Failed to get address", err)
@@ -548,12 +565,12 @@ func GetAddressFromKeyName(keyName *C.char) *C.char {
 
 //export ImportAccountFromMnemoic
 func ImportAccountFromMnemoic(mnemonic *C.char, keyName *C.char) C.int {
-	logrus.Debug("Call Import Account")
-	// GetListAccountInfo()
 	mnemonicStr := C.GoString(mnemonic)
+	keyNameStr := C.GoString(keyName)
+	PrintPayload("ImportAccountFromMnemoic", mnemonicStr, keyNameStr)
 	// Create a keyring
 	kring := gosdk.Keyring
-	signer, privateKey, err := gonibi.CreateSigner(mnemonicStr, kring, C.GoString(keyName))
+	signer, privateKey, err := gonibi.CreateSigner(mnemonicStr, kring, keyNameStr)
 	if err != nil {
 		logrus.Debug("Failed to import account:", err)
 		return Fail
@@ -568,7 +585,7 @@ func ImportAccountFromMnemoic(mnemonic *C.char, keyName *C.char) C.int {
 
 //export ImportAccountFromPrivateKey
 func ImportAccountFromPrivateKey(privateKey *C.uint8_t, keyName *C.char) C.int {
-	logrus.Debug("Call ImportAccountFromPrivateKey")
+	PrintPayload("ImportAccountFromPrivateKey", C.GoString(keyName))
 	// Decode the private key string from hex
 	privKeyBytes := cUint8ToGoSlice(privateKey)
 	if privKeyBytes == nil {
@@ -623,7 +640,7 @@ func GetListAccount(length *C.int) **C.KeyInfo {
 
 //export GetAccountByKeyName
 func GetAccountByKeyName(keyName *C.char) *C.KeyInfo {
-	logrus.Debug("Call GetAccountByKeyName")
+	PrintPayload("GetAccountByKeyName", C.GoString(keyName))
 	keyInfo, err := gosdk.Keyring.Key(C.GoString(keyName))
 	if err != nil {
 		logrus.Error("GetAccountByKeyName Failed: ", err)
@@ -636,13 +653,13 @@ func GetAccountByKeyName(keyName *C.char) *C.KeyInfo {
 		logrus.Error("GetAccountByKeyName Failed to get dddress: ", err)
 		return nil
 	}
-	logrus.Printf("Name: %s\nPubkey: %s\n address: %s", keyInfo.Name, keyInfo.PubKey, addr.String())
+	logrus.Infof("Name: %s\nPubkey: %s\n address: %s", keyInfo.Name, keyInfo.PubKey, addr.String())
 	return convertKeyInfo(keyInfo)
 }
 
 //export GetAccountByAddress
 func GetAccountByAddress(addr *C.char) *C.KeyInfo {
-	logrus.Debug("Call GetAccountByAddress")
+	PrintPayload("GetAccountByAddress", C.GoString(addr))
 	address, err := sdk.AccAddressFromBech32(C.GoString(addr))
 	if err != nil {
 		logrus.Error("GetAccountByaddr Failed: ", err)
@@ -709,7 +726,7 @@ func PrintListSigners() {
 		if err != nil {
 			logrus.Error("GetAccountByKeyName Failed to get address: ", err)
 		}
-		logrus.Printf("Name: %s\nPubkey: %s\n address: %s", signer.Name, signer.PubKey, addr)
+		logrus.Infof("Name: %s\n address: %s", signer.Name, addr.String())
 	}
 }
 
@@ -727,32 +744,21 @@ func DeleteAccount(keyName *C.char, password *C.char) C.int {
 }
 
 //export TestTransferToken
-func TestTransferToken() C.int {
-	// accounts, err := GetListAccountInfo()
-	// if err != nil {
-	// 	return Fail
-	// }
-	addr1 := "nibi1zaavvzxez0elundtn32qnk9lkm8kmcsz44g7xl"
-	acc1Coin, err := GetAccountCoins(addr1)
-	if err != nil {
-		logrus.Error("Can't get list account", err)
-		return Fail
-	}
-	logrus.Info(addr1, " ", acc1Coin.Denoms())
-	addr2 := "nibi1tq2ynj3x3k7z09r2z6qqndvpmk57ffr2ma39nh"
-	acc2Coin, err := GetAccountCoins(addr2)
-	if err != nil {
-		logrus.Error("Can't get account coin", err)
-		return Fail
-	}
-	logrus.Info(addr2, " ", acc2Coin.Denoms(), acc2Coin.AmountOf("unibi"))
+func TestTransferToken(addr1 *C.char, addr2 *C.char) C.int {
+	PrintPayload("TestTransferToken", C.GoString(addr1), C.GoString(addr2))
+	// admin address
+	addr1Str := C.GoString(addr1)
+	addr2Str := C.GoString(addr2)
+
+	PrintBaseAccountInfo(addr1Str, addr2Str)
+
 	denomStr := "unibi"
 
 	coin := sdk.NewCoins(sdk.NewInt64Coin(denomStr, 100))
 
 	// Create a MsgSend message to transfer tokens
-	rawaddr1, _ := sdk.AccAddressFromBech32(addr1)
-	rawaddr2, _ := sdk.AccAddressFromBech32(addr2)
+	rawaddr1, _ := sdk.AccAddressFromBech32(addr1Str)
+	rawaddr2, _ := sdk.AccAddressFromBech32(addr2Str)
 	msgSend := banktypes.NewMsgSend(rawaddr1, rawaddr2, coin)
 
 	// Broadcast the transaction to the blockchain network
@@ -762,28 +768,8 @@ func TestTransferToken() C.int {
 		return Fail
 	}
 
-	PrintAccount()
+	defer PrintBaseAccountInfo(addr1Str, addr2Str)
 	return Success
-}
-func PrintAccount() error {
-	logrus.Info("Call PrintAccount")
-	accounts, err := GetListAccountInfo()
-	if err != nil {
-		return err
-	}
-	addr1 := accounts[1].GetAddress()
-	acc1Coin, err := GetAccountCoins(addr1.String())
-	if err != nil {
-		return err
-	}
-	logrus.Info(addr1.String(), " ", acc1Coin.String())
-	addr2 := accounts[2].GetAddress()
-	acc2Coin, err := GetAccountCoins(addr2.String())
-	if err != nil {
-		return err
-	}
-	logrus.Info(addr2.String(), " ", acc2Coin.Denoms(), acc2Coin.AmountOf("unibi"))
-	return nil
 }
 
 func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) (*sdk.TxResponse, error) {
@@ -792,6 +778,7 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) (*sdk.Tx
 	fromStr := C.GoString(fromAddress)
 	toStr := C.GoString(toAddress)
 	denomStr := C.GoString(denom)
+	PrintBaseAccountInfo(fromStr, toStr)
 
 	// Get the sender's address
 	from, err := sdk.AccAddressFromBech32(fromStr)
@@ -812,7 +799,7 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) (*sdk.Tx
 
 	// Create a MsgSend message to transfer tokens
 	msgSend := banktypes.NewMsgSend(from, to, coin)
-
+	defer PrintBaseAccountInfo(fromStr, toStr)
 	// Broadcast the transaction to the blockchain network
 	return gosdk.BroadcastMsgs(from, msgSend)
 }

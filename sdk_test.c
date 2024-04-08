@@ -13,7 +13,8 @@ int main()
         return 1;
     }
 
-    char *keyName = "Mykey3";
+    char *keyNameAdmin = "Mykey3";
+    char *keyName = "Mykey1";
     // Create new wallet
     // Generate Menomonic
     char *prases = GenerateRecoveryPhrase();
@@ -21,19 +22,25 @@ int main()
 
     // Create key(private,public =>signner) from menemonic
     char *passPrares = "pass";
-    int createAccount = CreateAccount(keyName, adminPhases, passPrares);
+    int createAdminAccount = CreateAccount(keyNameAdmin, adminPhases, passPrares);
+    if (createAdminAccount != 0)
+    {
+        printf("Failed to create account\n");
+        return 1;
+    }
+    int createAccount = CreateAccount(keyName, prases, passPrares);
     if (createAccount != 0)
     {
         printf("Failed to create account\n");
         return 1;
     }
 
-    u_int8_t *privkey = GetPrivKeyFromMnemonic(adminPhases, keyName);
-    if (privkey == NULL)
-    {
-        printf("Failed to get private key\n");
-        return 1;
-    }
+    // u_int8_t *privkey = GetPrivKeyFromMnemonic(adminPhases, keyNameAdmin);
+    // if (privkey == NULL)
+    // {
+    //     printf("Failed to get private key\n");
+    //     return 1;
+    // }
 
     // int import = ImportAccountFromMnemoic(prases, keyName);
 
@@ -43,14 +50,18 @@ int main()
     //     return 1;
     // }
 
-    // Get wallet address
+    // Get account address
     char *address = GetAddressFromKeyName(keyName);
     if (address == NULL)
     {
         printf("Failed to get Address key\n");
         return 1;
     }
-    printf("Address: %s\n", address);
+
+    char *adminAddress = GetAddressFromKeyName(keyNameAdmin);
+
+    printf("Admin Address: %s\n", adminAddress);
+    printf("Account Address: %s\n", address);
 
     // int importP = ImportAccountFromPrivateKey(privkey, keyName);
 
@@ -97,9 +108,10 @@ int main()
     //     return 1;
     // }
 
+    BaseAccount *baseAccAdmin = QueryAccount(adminAddress);
     BaseAccount *baseAcc = QueryAccount(address);
 
-    int testTx = TestTransferToken();
+    int testTx = TestTransferToken(adminAddress, address);
     if (testTx != 0)
     {
         printf("Failed to Test transfer\n");
