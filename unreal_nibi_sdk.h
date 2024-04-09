@@ -19,6 +19,49 @@ typedef struct { const char *p; ptrdiff_t n; } _GoString_;
 /* Start of preamble from import "C" comments.  */
 
 
+#line 3 "api.go"
+
+#include <stdint.h> // for uint32_t
+
+// If crypto.Address and crypto.PubKey are fixed-size byte arrays, define their sizes
+#define ADDRESS_SIZE 20 // Example size, adjust according to actual crypto.Address size
+#define PUBKEY_SIZE  58 // Example size, adjust according to actual crypto.PubKey size
+
+// Define a C-compatible KeyInfo struct
+typedef struct {
+	uint32_t Type;
+	const char* Name;
+	const uint8_t PubKey[PUBKEY_SIZE];
+	const uint8_t Address[ADDRESS_SIZE];
+} KeyInfo;
+
+typedef struct {
+	KeyInfo* Info;
+	char* Password;
+} UserAccount;
+
+// Define the Coin type in C, assuming both Denom and Amount are strings
+typedef struct {
+    char *Denom;
+    uint64_t Amount;
+} Coin;
+
+// If Coins is a dynamic array or slice of Coin, you will need a struct to represent it
+typedef struct {
+    Coin *Array;     // Pointer to the first Coin element
+    size_t Length;   // Number of elements in the Coins array
+} Coins;
+
+// Then define the BaseAccount struct in C
+typedef struct {
+    uint8_t Address[ADDRESS_SIZE];
+    Coins*   Coins;              // Assuming Coins is represented as above
+    uint8_t PubKey[PUBKEY_SIZE];
+    uint64_t AccountNumber;
+    uint64_t Sequence;
+} BaseAccount;
+
+#line 1 "cgo-generated-wrapper"
 
 
 /* End of preamble from import "C" comments.  */
@@ -74,15 +117,23 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
+extern int SwitchNetwork(char* network);
+extern BaseAccount* QueryAccount(char* address);
 extern int NewNibiruClientDefault();
 extern int NewNibiruClient(char* chainId, char* grpcEndpoint, char* rpcEndpoint);
 extern char* GenerateRecoveryPhrase();
-extern int CreateAccount(char* keyName, char* mnemonic);
-extern int GetPrivKeyFromMnemonic(char* mnemoic, char* keyName);
-extern int GetAddressFromMnemonic(char* mnemoic, char* keyName);
-extern int AddSignerToKeyring(char* mnemoic, char* keyName);
-extern int ImportAccount(char* mnemonic, char* privateKey, char* keyName);
+extern int CreateAccount(char* keyName, char* mnemonic, char* passphase);
+extern uint8_t* GetPrivKeyFromMnemonic(char* mnemoic, char* keyName);
+extern char* GetAddressFromKeyName(char* keyName);
+extern int ImportAccountFromMnemoic(char* mnemonic, char* keyName);
+extern int ImportAccountFromPrivateKey(uint8_t* privateKey, char* keyName);
+extern KeyInfo** GetListAccount(int* length);
+extern KeyInfo* GetAccountByKeyName(char* keyName);
+extern KeyInfo* GetAccountByAddress(char* addr);
+extern int HasKeyByName(char* name);
+extern int HasKeyByAddress(char* addr, int len);
 extern int DeleteAccount(char* keyName, char* password);
+extern int TransferToken(char* fromAddress, char* toAddress, char* denom, int amount);
 
 #ifdef __cplusplus
 }
