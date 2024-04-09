@@ -133,7 +133,7 @@ extern KeyInfo* GetAccountByAddress(char* addr);
 extern int HasKeyByName(char* name);
 extern int HasKeyByAddress(char* addr, int len);
 extern int DeleteAccount(char* keyName, char* password);
-extern int TestTransferToken(char* addr1, char* addr2);
+extern int TransferToken(char* fromAddress, char* toAddress, char* denom, int amount);
 
 #ifdef __cplusplus
 }

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "unreal_nibi_sdk.h"
+#include <unistd.h>
 
 int main()
 {
@@ -13,11 +14,11 @@ int main()
         return 1;
     }
 
-    char *keyNameAdmin = "Mykey3";
-    char *keyName = "Mykey1";
+    char *keyNameAdmin = "AdminKey";
+    char *keyName = "TestKey";
     // Create new wallet
     // Generate Menomonic
-    char *prases = GenerateRecoveryPhrase();
+    char *prases = "napkin rigid magnet grass plastic spawn replace hobby tray eternal pupil olive pledge nasty animal base bitter climb guess analyst fat neglect zoo earn";
     char *adminPhases = "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host";
 
     // Create key(private,public =>signner) from menemonic
@@ -111,7 +112,7 @@ int main()
     BaseAccount *baseAccAdmin = QueryAccount(adminAddress);
     BaseAccount *baseAcc = QueryAccount(address);
 
-    int testTx = TestTransferToken(adminAddress, address);
+    int testTx = TransferToken(adminAddress, address, "unibi", 250);
     if (testTx != 0)
     {
         printf("Failed to Test transfer\n");

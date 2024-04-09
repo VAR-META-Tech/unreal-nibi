@@ -465,7 +465,6 @@ func convertKeyInfo(key *keyring.Record) *C.KeyInfo {
 
 //export CreateAccount
 func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
-	PrintListSigners()
 	PrintPayload("CreateAccount", C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase))
 	// algo := hd.Secp256k1
 	// // Create a keyring
@@ -488,6 +487,8 @@ func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
 
 	addr, _ := record.GetAddress()
 	logrus.Printf("Account created with address: %s", addr.String())
+
+	PrintListSigners()
 	return Success
 }
 
@@ -743,36 +744,8 @@ func DeleteAccount(keyName *C.char, password *C.char) C.int {
 	return Success
 }
 
-//export TestTransferToken
-func TestTransferToken(addr1 *C.char, addr2 *C.char) C.int {
-	PrintPayload("TestTransferToken", C.GoString(addr1), C.GoString(addr2))
-	// admin address
-	addr1Str := C.GoString(addr1)
-	addr2Str := C.GoString(addr2)
-
-	PrintBaseAccountInfo(addr1Str, addr2Str)
-
-	denomStr := "unibi"
-
-	coin := sdk.NewCoins(sdk.NewInt64Coin(denomStr, 100))
-
-	// Create a MsgSend message to transfer tokens
-	rawaddr1, _ := sdk.AccAddressFromBech32(addr1Str)
-	rawaddr2, _ := sdk.AccAddressFromBech32(addr2Str)
-	msgSend := banktypes.NewMsgSend(rawaddr1, rawaddr2, coin)
-
-	// Broadcast the transaction to the blockchain network
-	txRsp, err := gosdk.BroadcastMsgs(rawaddr1, msgSend)
-	if err != nil || txRsp == nil {
-		logrus.Error("Transfer Error", err)
-		return Fail
-	}
-
-	defer PrintBaseAccountInfo(addr1Str, addr2Str)
-	return Success
-}
-
-func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) (*sdk.TxResponse, error) {
+//export TransferToken
+func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 	logrus.Info("Call TransferToken")
 	// Convert C strings to Go strings
 	fromStr := C.GoString(fromAddress)
@@ -784,14 +757,14 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) (*sdk.Tx
 	from, err := sdk.AccAddressFromBech32(fromStr)
 	if err != nil {
 		logrus.Error("Can't get fromAddress", err)
-		return nil, err
+		return Fail
 	}
 
 	// Get the recipient's address
 	to, err := sdk.AccAddressFromBech32(toStr)
 	if err != nil {
 		logrus.Error("Can't get toAddress", err)
-		return nil, err
+		return Fail
 	}
 
 	// Create a coin with the specified denomination and amount
@@ -801,5 +774,12 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) (*sdk.Tx
 	msgSend := banktypes.NewMsgSend(from, to, coin)
 	defer PrintBaseAccountInfo(fromStr, toStr)
 	// Broadcast the transaction to the blockchain network
-	return gosdk.BroadcastMsgs(from, msgSend)
+	_, err = gosdk.BroadcastMsgs(from, msgSend)
+
+	if err != nil {
+		logrus.Error("Error BroadcastMsgs", err)
+		return Fail
+	}
+
+	return Success
 }
