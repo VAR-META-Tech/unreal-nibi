@@ -123,7 +123,7 @@ func InitClients() error {
 
 func PrintPayload(funcName string, args ...interface{}) {
 	// Log the function name
-	logrus.WithField("", funcName).Info("\n\nCall function")
+	logrus.WithField("Name", funcName).Info("\n\nCall function")
 
 	// Log the function parameters
 	for i, arg := range args {
@@ -747,6 +747,7 @@ func DeleteAccount(keyName *C.char, password *C.char) C.int {
 //export TransferToken
 func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 	logrus.Info("Call TransferToken")
+	PrintPayload("TransferToken", C.GoString(fromAddress), C.GoString(toAddress), C.GoString(denom), amount)
 	// Convert C strings to Go strings
 	fromStr := C.GoString(fromAddress)
 	toStr := C.GoString(toAddress)

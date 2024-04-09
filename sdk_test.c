@@ -36,78 +36,12 @@ int main()
         return 1;
     }
 
-    // u_int8_t *privkey = GetPrivKeyFromMnemonic(adminPhases, keyNameAdmin);
-    // if (privkey == NULL)
-    // {
-    //     printf("Failed to get private key\n");
-    //     return 1;
-    // }
-
-    // int import = ImportAccountFromMnemoic(prases, keyName);
-
-    // if (import != 0)
-    // {
-    //     printf("\nFailed to import account\n");
-    //     return 1;
-    // }
-
     // Get account address
     char *address = GetAddressFromKeyName(keyName);
-    if (address == NULL)
-    {
-        printf("Failed to get Address key\n");
-        return 1;
-    }
-
     char *adminAddress = GetAddressFromKeyName(keyNameAdmin);
 
     printf("Admin Address: %s\n", adminAddress);
     printf("Account Address: %s\n", address);
-
-    // int importP = ImportAccountFromPrivateKey(privkey, keyName);
-
-    // if (importP != 0)
-    // {
-    //     printf("\nFailed to import account from privateKey\n");
-    //     return 1;
-    // }
-
-    // int len;
-
-    // KeyInfo **keyInfos = GetListAccount(&len);
-
-    // if (keyInfos != NULL)
-    // {
-    //     // Use the keyInfos array
-    //     for (int i = 0; i < len; ++i)
-    //     {
-    //         KeyInfo *keyInfo = keyInfos[i];
-    //         // Do something with keyInfo, e.g., print it
-    //         printf("Key Name: %s\n", keyInfo->Name);
-    //         printf("Key Type: %d\n", keyInfo->Type);
-    //         // printf("Key Address: %s\n", keyInfo->Address);
-    //         // printf("Key PubKey: %s\n", keyInfo->PubKey);
-    //     }
-    // }
-
-    // KeyInfo *keyInfo = GetAccountByKeyName(keyName);
-    // if (keyInfo != NULL)
-    // {
-    //     printf("KeyInfo: %s\n", keyInfo->Name);
-    // }
-
-    // KeyInfo *KeyInfo2 = GetAccountByAddress(address);
-    // if (KeyInfo2 != NULL)
-    // {
-    //     printf("KeyInfo Address: %s\n", KeyInfo2->Address);
-    // }
-
-    // int deleteAccount = DeleteAccount(keyName, passPrares);
-    // if (deleteAccount != 0)
-    // {
-    //     printf("\nFailed to delete account\n");
-    //     return 1;
-    // }
 
     BaseAccount *baseAccAdmin = QueryAccount(adminAddress);
     BaseAccount *baseAcc = QueryAccount(address);
@@ -118,18 +52,5 @@ int main()
         printf("Failed to Test transfer\n");
         return 1;
     }
-    // if (baseAcc != NULL)
-    // {
-    //     printf("User coins count: %lu\n", baseAcc->Coins->Length);
-    //     for (int i = 0; i < baseAcc->Coins->Length; i++)
-    //     {
-    //         printf("%d, %s coins have %llu\n", i + 1, baseAcc->Coins->Array[i].Denom, baseAcc->Coins->Array[i].Amount);
-    //     }
-    // }
-    // else
-    // {
-    //     printf("\n Err: can't get base account");
-    // }
-
-    // return 0;
+    return 0;
 }
