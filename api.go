@@ -48,6 +48,7 @@ import (
 	"fmt"
 	"unsafe"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/Unique-Divine/gonibi"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -781,6 +782,53 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 		logrus.Error("Error BroadcastMsgs", err)
 		return Fail
 	}
+
+	return Success
+}
+
+//export ExecuteWasmContract
+func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.char, amount C.int) C.int {
+	// Convert C types to Go types
+	fromStr := C.GoString(senderAddress)
+	contractStr := C.GoString(contractAddress)
+	msgStr := C.GoString(executeMsg)
+	denomStr := C.GoString(denom)
+	amountInt := sdk.NewInt(int64(amount))
+
+	// Get the sender's address
+	from, err := sdk.AccAddressFromBech32(fromStr)
+	if err != nil {
+		logrus.Error("Failed to parse sender address:", err)
+		return C.int(-1)
+	}
+
+	// Get the contract address
+	contract, err := sdk.AccAddressFromBech32(contractStr)
+	if err != nil {
+		logrus.Error("Failed to parse contract address:", err)
+		return C.int(-1)
+	}
+
+	// Create the coins to send with the message
+	coins := sdk.NewCoins(sdk.NewCoin(denomStr, amountInt))
+
+	// Create the Wasm execute message
+	msgExe := &wasmtypes.MsgExecuteContract{
+		Sender:   from.String(),
+		Contract: contract.String(),
+		Msg:      []byte(msgStr),
+		Funds:    coins,
+	}
+
+	// Broadcast the transaction to the blockchain network
+	responseMsg, err := gosdk.BroadcastMsgs(from, msgExe)
+
+	if err != nil {
+		logrus.Error("Error BroadcastMsgs", err)
+		return Fail
+	}
+
+	logrus.Info("Response: ", responseMsg.String())
 
 	return Success
 }
