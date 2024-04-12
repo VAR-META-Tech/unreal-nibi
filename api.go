@@ -44,6 +44,7 @@ typedef struct {
 import "C"
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"unsafe"
@@ -111,12 +112,14 @@ var gosdk gonibi.NibiruClient
 var sdkCtx sdk.Context
 var authClient authtypes.QueryClient
 var bankClient banktypes.QueryClient
+var wasmClient wasmtypes.QueryClient
 var networkInfo NetworkInfo
 
 func InitClients() error {
 	authClient = authtypes.NewQueryClient(gosdk.Querier.ClientConn)
 	bankClient = banktypes.NewQueryClient(gosdk.Querier.ClientConn)
-	if authClient == nil || bankClient == nil {
+	wasmClient = wasmtypes.NewQueryClient(gosdk.Querier.ClientConn)
+	if authClient == nil || bankClient == nil || wasmClient == nil {
 		return errors.New("can't init client")
 	}
 	return nil
@@ -787,7 +790,7 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 }
 
 //export ExecuteWasmContract
-func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.char, amount C.int) C.int {
+func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.char, amount C.int) *C.char {
 	// Convert C types to Go types
 	fromStr := C.GoString(senderAddress)
 	contractStr := C.GoString(contractAddress)
@@ -799,14 +802,14 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.ch
 	from, err := sdk.AccAddressFromBech32(fromStr)
 	if err != nil {
 		logrus.Error("Failed to parse sender address:", err)
-		return C.int(-1)
+		return nil
 	}
 
 	// Get the contract address
 	contract, err := sdk.AccAddressFromBech32(contractStr)
 	if err != nil {
 		logrus.Error("Failed to parse contract address:", err)
-		return C.int(-1)
+		return nil
 	}
 
 	// Create the coins to send with the message
@@ -825,10 +828,30 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.ch
 
 	if err != nil {
 		logrus.Error("Error BroadcastMsgs", err)
-		return Fail
+		return nil
 	}
 
-	logrus.Info("Response: ", responseMsg.String())
+	logrus.Info("Response: ", string(responseMsg.String()))
 
-	return Success
+	return C.CString(responseMsg.TxHash)
+}
+
+//export QueryTXHash
+func QueryTXHash(txHash *C.char) *C.char {
+	decodedBytes, err := hex.DecodeString(C.GoString(txHash))
+
+	if err != nil {
+		logrus.Error("Error getTX info: ", err)
+		return nil
+	}
+
+	resultTx, err := gosdk.CometRPC.Tx(context.Background(), decodedBytes, true)
+
+	if err != nil {
+		logrus.Error("Error getTX info: ", err)
+		return nil
+	}
+
+	logrus.Info("Result: ", resultTx.TxResult.Log)
+	return C.CString(resultTx.TxResult.Log)
 }
