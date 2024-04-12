@@ -44,10 +44,12 @@ typedef struct {
 import "C"
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"unsafe"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/Unique-Divine/gonibi"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -110,12 +112,14 @@ var gosdk gonibi.NibiruClient
 var sdkCtx sdk.Context
 var authClient authtypes.QueryClient
 var bankClient banktypes.QueryClient
+var wasmClient wasmtypes.QueryClient
 var networkInfo NetworkInfo
 
 func InitClients() error {
 	authClient = authtypes.NewQueryClient(gosdk.Querier.ClientConn)
 	bankClient = banktypes.NewQueryClient(gosdk.Querier.ClientConn)
-	if authClient == nil || bankClient == nil {
+	wasmClient = wasmtypes.NewQueryClient(gosdk.Querier.ClientConn)
+	if authClient == nil || bankClient == nil || wasmClient == nil {
 		return errors.New("can't init client")
 	}
 	return nil
@@ -783,4 +787,71 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 	}
 
 	return Success
+}
+
+//export ExecuteWasmContract
+func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.char, amount C.int) *C.char {
+	// Convert C types to Go types
+	fromStr := C.GoString(senderAddress)
+	contractStr := C.GoString(contractAddress)
+	msgStr := C.GoString(executeMsg)
+	denomStr := C.GoString(denom)
+	amountInt := sdk.NewInt(int64(amount))
+
+	// Get the sender's address
+	from, err := sdk.AccAddressFromBech32(fromStr)
+	if err != nil {
+		logrus.Error("Failed to parse sender address:", err)
+		return nil
+	}
+
+	// Get the contract address
+	contract, err := sdk.AccAddressFromBech32(contractStr)
+	if err != nil {
+		logrus.Error("Failed to parse contract address:", err)
+		return nil
+	}
+
+	// Create the coins to send with the message
+	coins := sdk.NewCoins(sdk.NewCoin(denomStr, amountInt))
+
+	// Create the Wasm execute message
+	msgExe := &wasmtypes.MsgExecuteContract{
+		Sender:   from.String(),
+		Contract: contract.String(),
+		Msg:      []byte(msgStr),
+		Funds:    coins,
+	}
+
+	// Broadcast the transaction to the blockchain network
+	responseMsg, err := gosdk.BroadcastMsgs(from, msgExe)
+
+	if err != nil {
+		logrus.Error("Error BroadcastMsgs", err)
+		return nil
+	}
+
+	logrus.Info("Response: ", string(responseMsg.String()))
+
+	return C.CString(responseMsg.TxHash)
+}
+
+//export QueryTXHash
+func QueryTXHash(txHash *C.char) *C.char {
+	decodedBytes, err := hex.DecodeString(C.GoString(txHash))
+
+	if err != nil {
+		logrus.Error("Error getTX info: ", err)
+		return nil
+	}
+
+	resultTx, err := gosdk.CometRPC.Tx(context.Background(), decodedBytes, true)
+
+	if err != nil {
+		logrus.Error("Error getTX info: ", err)
+		return nil
+	}
+
+	logrus.Info("Result: ", resultTx.TxResult.Log)
+	return C.CString(resultTx.TxResult.Log)
 }
