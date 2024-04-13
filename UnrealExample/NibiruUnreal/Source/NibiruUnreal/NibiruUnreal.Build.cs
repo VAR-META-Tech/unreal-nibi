@@ -12,21 +12,15 @@ public class NibiruUnreal : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
-		// string destinationDirectory = Target.ProjectFile.Directory.FullName;
-		// PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../") });
-		// PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../libs/") });
-		// PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../libs/calc") });
-		// PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../libs/cmdctx") });
-		// PublicIncludePaths.AddRange(new string[] { destinationDirectory });
-		// Add the directory to the runtime search paths
-		// PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "../../unreal_nibi_sdk.dylib"));
-		// RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../unreal_nibi_sdk.dylib"));
-
-		//PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "../../unreal_nibi_sdk.dylib"));
-
-		//bUseRTTI = true;
-		// bEnableUndefinedIdentifierWarnings = false;
-		// CppStandard = CppStandardVersion.Cpp17;
+		if (Target.Platform == UnrealTargetPlatform.Mac)
+		{
+			string unreal_nibi_sdk_LibPath = Path.Combine(ModuleDirectory, "../../../../", "unreal_nibi_sdk.dylib");
+			string destinationDirectory = Target.ProjectFile.Directory.FullName;
+			File.Copy(unreal_nibi_sdk_LibPath, Path.Combine(destinationDirectory, "unreal_nibi_sdk.dylib"), true);
+			PublicAdditionalLibraries.Add(Path.Combine(destinationDirectory, "unreal_nibi_sdk.dylib"));
+			PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../") });
+			PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../") });
+		}
 
 	}
 }
