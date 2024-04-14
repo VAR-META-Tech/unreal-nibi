@@ -21,6 +21,6 @@ public class NibiruUnreal : ModuleRules
 			PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../") });
 			PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../") });
 		}
-
+		CppStandard = CppStandardVersion.Cpp17;
 	}
 }
