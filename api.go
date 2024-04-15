@@ -76,9 +76,9 @@ var (
 	LocalNetworkInfo = NetworkInfo{
 		GrpcEndpoint:      "localhost:9090",
 		LcdEndpoint:       "http://localhost:1317",
-		TmRpcEndpoint:     "http://localhost:26657",
+		TmRpcEndpoint:     "https://rpc.nibiru.fi:443",
 		WebsocketEndpoint: "ws://localhost:26657/websocket",
-		ChainID:           "nibiru-localnet-0",
+		ChainID:           "cataclysm-1",
 	}
 	DevNetworkInfo = NetworkInfo{
 		GrpcEndpoint:      "tcp://grpc.devnet-2.nibiru.fi:443",
@@ -88,18 +88,18 @@ var (
 		ChainID:           "nibiru-devnet-2",
 	}
 	TestNetworkInfo = NetworkInfo{
-		GrpcEndpoint:      "tcp://grpc.testnet-1.nibiru.fi:9090",
+		GrpcEndpoint:      "grpc.testnet-1.nibiru.fi:443",
 		LcdEndpoint:       "https://lcd.testnet-1.nibiru.fi",
-		TmRpcEndpoint:     "https://rpc.testnet-1.nibiru.fi::443",
+		TmRpcEndpoint:     "https://rpc.testnet-1.nibiru.fi:443",
 		WebsocketEndpoint: "wss://rpc.testnet-1.nibiru.fi/websocket",
 		ChainID:           "nibiru-testnet-1",
 	}
 	MainNetworkInfo = NetworkInfo{
-		GrpcEndpoint:      "localhost:9090",
-		LcdEndpoint:       "http://localhost:1317",
+		GrpcEndpoint:      "grpc.nibiru.fi:443",
+		LcdEndpoint:       "https://lcd.nibiru.fi",
 		TmRpcEndpoint:     "https://rpc.nibiru.fi:443",
-		WebsocketEndpoint: "ws://localhost:26657/websocket",
-		ChainID:           "cataclysm-1",
+		WebsocketEndpoint: "wss://rpc.nibiru.fi/websocket",
+		ChainID:           "nibiru-localnet-0",
 	}
 )
 
@@ -139,7 +139,7 @@ func init() {
 	logrus.SetLevel(logrus.DebugLevel)
 	networkInfo = LocalNetworkInfo
 
-	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, false, 2)
 	if err != nil {
 		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
 	}
@@ -171,7 +171,7 @@ func SwitchNetwork(network *C.char) C.int {
 	default:
 		networkInfo = TestNetworkInfo
 	}
-	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, false, 2)
 	if err != nil {
 		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
 		return Fail
@@ -361,7 +361,7 @@ func QueryAccount(address *C.char) *C.BaseAccount {
 //export NewNibiruClientDefault
 func NewNibiruClientDefault() C.int {
 	logrus.Println("Call [NewNibiruClientDefault]") // Use logrus instead of fmt.Println
-	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, false, 2)
 	if err != nil {
 		logrus.Println("[NewNibiruClientDefault] GetGRPCConnection error: " + err.Error())
 		return Fail
@@ -834,6 +834,37 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.ch
 	logrus.Info("Response: ", string(responseMsg.String()))
 
 	return C.CString(responseMsg.TxHash)
+}
+
+//export QueryWasmContract
+func QueryWasmContract(contractAddress, queryMsg *C.char) *C.char {
+	// Convert C types to Go types
+	contractStr := C.GoString(contractAddress)
+	msgStr := C.GoString(queryMsg)
+
+	// Get the contract address
+	contract, err := sdk.AccAddressFromBech32(contractStr)
+	if err != nil {
+		logrus.Error("Failed to parse contract address:", err)
+		return nil
+	}
+
+	// Create the Wasm execute message
+	msgExe := &wasmtypes.QuerySmartContractStateRequest{
+		Address:   contract.String(),
+		QueryData: []byte(msgStr),
+	}
+
+	responseMsg, err := wasmClient.SmartContractState(context.Background(), msgExe)
+
+	if err != nil {
+		logrus.Error("Error SmartContractState", err)
+		return nil
+	}
+
+	logrus.Info("Response: ", string(responseMsg.String()))
+
+	return C.CString(responseMsg.String())
 }
 
 //export QueryTXHash
