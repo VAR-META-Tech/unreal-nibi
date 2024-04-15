@@ -31,3 +31,5 @@
 *.out
 *.app
 sdk_test
+
+vendor/

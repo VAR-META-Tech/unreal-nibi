@@ -3,9 +3,8 @@ module github.com/VAR-META-Tech/unreal-nibi
 go 1.22.0
 
 require (
-	github.com/NibiruChain/nibiru v0.21.7
+	github.com/CosmWasm/wasmd v0.44.0
 	github.com/Unique-Divine/gonibi v0.0.5
-	github.com/cometbft/cometbft v0.37.2
 	github.com/cosmos/cosmos-sdk v0.47.5
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/sirupsen/logrus v1.9.0
@@ -30,9 +29,9 @@ require (
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
 	github.com/99designs/keyring v1.2.1 // indirect
 	github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d // indirect
-	github.com/CosmWasm/wasmd v0.44.0 // indirect
 	github.com/CosmWasm/wasmvm v1.5.0 // indirect
 	github.com/NibiruChain/collections v0.3.0 // indirect
+	github.com/NibiruChain/nibiru v0.21.7 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/aws/aws-sdk-go v1.44.203 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -49,6 +48,7 @@ require (
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/coinbase/rosetta-sdk-go/types v1.0.0 // indirect
+	github.com/cometbft/cometbft v0.37.2 // indirect
 	github.com/cometbft/cometbft-db v0.8.0 // indirect
 	github.com/confio/ics23/go v0.9.0 // indirect
 	github.com/cosmos/btcutil v1.0.5 // indirect
