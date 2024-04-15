@@ -837,6 +837,37 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.ch
 	return C.CString(responseMsg.TxHash)
 }
 
+//export QueryWasmContract
+func QueryWasmContract(contractAddress, queryMsg *C.char) *C.char {
+	// Convert C types to Go types
+	contractStr := C.GoString(contractAddress)
+	msgStr := C.GoString(queryMsg)
+
+	// Get the contract address
+	contract, err := sdk.AccAddressFromBech32(contractStr)
+	if err != nil {
+		logrus.Error("Failed to parse contract address:", err)
+		return nil
+	}
+
+	// Create the Wasm execute message
+	msgExe := &wasmtypes.QuerySmartContractStateRequest{
+		Address:   contract.String(),
+		QueryData: []byte(msgStr),
+	}
+
+	responseMsg, err := wasmClient.SmartContractState(context.Background(), msgExe)
+
+	if err != nil {
+		logrus.Error("Error SmartContractState", err)
+		return nil
+	}
+
+	logrus.Info("Response: ", string(responseMsg.String()))
+
+	return C.CString(responseMsg.String())
+}
+
 //export QueryTXHash
 func QueryTXHash(txHash *C.char) *C.char {
 	PrintPayload("QueryTXHash", C.GoString(txHash))

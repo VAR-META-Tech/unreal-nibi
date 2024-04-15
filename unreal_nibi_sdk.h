@@ -135,6 +135,7 @@ extern int HasKeyByAddress(char* addr, int len);
 extern int DeleteAccount(char* keyName, char* password);
 extern int TransferToken(char* fromAddress, char* toAddress, char* denom, int amount);
 extern char* ExecuteWasmContract(char* senderAddress, char* contractAddress, char* executeMsg, char* denom, int amount);
+extern char* QueryWasmContract(char* contractAddress, char* queryMsg);
 extern char* QueryTXHash(char* txHash);
 
 #ifdef __cplusplus
