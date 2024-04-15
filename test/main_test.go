@@ -2,6 +2,7 @@ package test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/Unique-Divine/gonibi"
 	"github.com/stretchr/testify/assert"
@@ -55,7 +56,10 @@ func (s *MainTestSuite) TestNetworkInit() {
 
 // QueryAccount Test
 func (s *MainTestSuite) TestQueryAccount() {
-	addr := "cosmos1qperwt9wrnkg5k9e5gzfgjppzpqhyav5j24d66"
+	// create Account first
+	phrase := GenerateRecoveryPhrase()
+	CreateAccount("test_key", phrase, "pass")
+	addr := GetAddressFromKeyName("test_key")
 	acc, err := QueryAccount(addr)
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), acc)
@@ -63,7 +67,8 @@ func (s *MainTestSuite) TestQueryAccount() {
 
 // Test GetAccountCoins
 func (s *MainTestSuite) TestGetAccountCoins() {
-	addr := "cosmos1qperwt9wrnkg5k9e5gzfgjppzpqhyav5j24d66"
+
+	addr := "nibi1zaavvzxez0elundtn32qnk9lkm8kmcsz44g7xl" //admin addr
 	coins, err := GetAccountCoins(addr)
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), coins)
@@ -100,30 +105,25 @@ func (s *MainTestSuite) TestGetAddressFromKeyName() {
 // Test ImportAccountFromMnemoic
 func (s *MainTestSuite) TestImportAccountFromMnemoic() {
 	phrase := GenerateRecoveryPhrase()
-	check := ImportAccountFromMnemoic("test_key", phrase)
-	s.Equal(0, check)
+
+	check := ImportAccountFromMnemoic(phrase, "test_key")
+	s.Equal(Success, check)
 }
 
 // Test ImportAccountFromPrivateKey
 func (s *MainTestSuite) TestImportAccountFromPrivateKey() {
 	phrase := GenerateRecoveryPhrase()
-	privKey := GetPrivKeyFromMnemonic(phrase, "test_key")
-	check := ImportAccountFromPrivateKey(privKey, "key_name")
-	s.Equal(0, check)
-}
-
-func TestImportAccountFromPrivateKey(t *testing.T) {
-	privateKey := []byte{0x01, 0x02, 0x03} // Replace with your private key bytes
 	keyName := "TestKey"
+	privKey := GetPrivKeyFromMnemonic(phrase, keyName)
 
-	t.Run("ImportAccountFromPrivateKey_Success", func(t *testing.T) {
-		result := ImportAccountFromPrivateKey(privateKey, keyName)
+	s.T().Run("ImportAccountFromPrivateKey_Success", func(t *testing.T) {
+		result := ImportAccountFromPrivateKey(privKey, keyName)
 		if result != Success {
 			t.Errorf("Expected success, but got %d", result)
 		}
 	})
 
-	t.Run("ImportAccountFromPrivateKey_Failure", func(t *testing.T) {
+	s.T().Run("ImportAccountFromPrivateKey_Failure", func(t *testing.T) {
 		// Test with nil private key
 		result := ImportAccountFromPrivateKey(nil, keyName)
 		if result != Fail {
@@ -135,9 +135,10 @@ func TestImportAccountFromPrivateKey(t *testing.T) {
 // Test Get AccountByKeyName
 func (s *MainTestSuite) TestGetAccountByKeyName() {
 	phrase := GenerateRecoveryPhrase()
-	CreateAccount("test_key", phrase, "pass")
+	check := CreateAccount("test_key", phrase, "pass")
+	assert.Equal(s.T(), Success, check)
 	acc := GetAccountByKeyName("test_key")
-	assert.NotNil(s.T(), acc)
+	s.Equal("test_key", acc.Name)
 }
 
 // Test GetAccountByAddress
@@ -211,16 +212,34 @@ func (s *MainTestSuite) TestTransferToken() {
 		assert.Equal(t, Fail, result)
 	})
 }
+func (s *MainTestSuite) TestExecuteAndQueryWasmContract() {
+	adminPhases := "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host"
 
-func TestExecuteWasmContract(t *testing.T) {
-	senderAddress := "cosmos1qperwt9wrnkg5k9e5gzfgjppzpqhyav5j24d66"
-	contractAddress := "cosmos1qperwt9wrnkg5k9e5gzfgjppzpqhyav5j24d66"
-	executeMsg := "execute"
-	denom := "unibi"
-	amount := 100
+	check1 := CreateAccount("admin", adminPhases, "pass")
+	assert.Equal(s.T(), 0, check1)
 
-	result := ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom, amount)
+	adminAddr := GetAddressFromKeyName("admin")
+	assert.NotNil(s.T(), adminAddr)
 
-	assert.NotEmpty(t, result)
-	assert.NotEqual(t, "nil", result)
+	contractAddr := "nibi1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3slkhcux"
+	executeMsg := "{\"mint\": {\"token_id\": \"unique-nft-15\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}"
+	s.T().Run("ExecuteWasmContract", func(t *testing.T) {
+		txHash := ExecuteWasmContract(adminAddr, contractAddr, executeMsg, "unibi", 75)
+		s.NotNil(txHash)
+		s.NotEmpty(txHash)
+
+		time.Sleep(3 * time.Second)
+		txResult := QueryTXHash(txHash)
+		s.NotNil(txResult)
+		s.NotEmpty(txResult)
+	})
+
+	time.Sleep(3 * time.Second)
+
+	s.T().Run("QueryWasmContract", func(t *testing.T) {
+		queryMsg := "{\"owner_of\": {\"token_id\": \"unique-nft-15\", \"include_expired\": false}}"
+		result := QueryWasmContract(contractAddr, queryMsg)
+		s.NotNil(result)
+		s.NotEmpty(result)
+	})
 }

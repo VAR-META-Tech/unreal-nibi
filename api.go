@@ -575,13 +575,9 @@ func ImportAccountFromMnemoic(mnemonic *C.char, keyName *C.char) C.int {
 	PrintPayload("ImportAccountFromMnemoic", mnemonicStr, keyNameStr)
 	// Create a keyring
 	kring := gosdk.Keyring
-	signer, privateKey, err := gonibi.CreateSigner(mnemonicStr, kring, keyNameStr)
+	signer, _, err := gonibi.CreateSigner(mnemonicStr, kring, keyNameStr)
 	if err != nil {
 		logrus.Debug("Failed to import account:", err)
-		return Fail
-	}
-	if err := gonibi.AddSignerToKeyring(kring, privateKey, privateKey.PubKey().String()); err != nil {
-		logrus.Error("Can't assing singer to keyring: ", err)
 		return Fail
 	}
 	logrus.Printf("Susscess to import account: name: %s", signer.Name)
@@ -839,6 +835,7 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.ch
 
 //export QueryWasmContract
 func QueryWasmContract(contractAddress, queryMsg *C.char) *C.char {
+	PrintPayload("QueryWasmContract", C.GoString(contractAddress), C.GoString(queryMsg))
 	// Convert C types to Go types
 	contractStr := C.GoString(contractAddress)
 	msgStr := C.GoString(queryMsg)

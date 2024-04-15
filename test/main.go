@@ -220,7 +220,7 @@ func GetListAccountInfo() (accouns []authtypes.AccountI, err error) {
 func GetAccountCoins(
 	address string,
 ) (sdk.Coins, error) {
-	PrintPayload("GetAccountCoins", address)
+	// PrintPayload("GetAccountCoins", address)
 	resp, err := bankClient.AllBalances(context.Background(), &banktypes.QueryAllBalancesRequest{
 		Address: address,
 	})
@@ -253,7 +253,7 @@ func PrintBaseAccountInfo(addrs ...string) {
 
 //export QueryAccount
 func QueryAccount(address string) (*BaseAccount, error) {
-	PrintPayload("QueryAccount", address)
+	// PrintPayload("QueryAccount", address)
 	account, err := GetAccountInfo(address)
 	if err != nil {
 		logrus.Error("Account not found: ", err)
@@ -340,7 +340,7 @@ func GenerateRecoveryPhrase() string {
 
 //export CreateAccount
 func CreateAccount(keyName string, mnemonic string, passphase string) int {
-	PrintPayload("CreateAccount", keyName, mnemonic, passphase)
+	// PrintPayload("CreateAccount", keyName, mnemonic, passphase)
 	record, _, err := gonibi.CreateSigner(mnemonic, gosdk.Keyring, keyName)
 	if err != nil {
 		logrus.Debug("Failed to create new account", err)
@@ -356,7 +356,7 @@ func CreateAccount(keyName string, mnemonic string, passphase string) int {
 
 //export GetPrivKeyFromMnemonic
 func GetPrivKeyFromMnemonic(mnemoic string, keyName string) []byte {
-	PrintPayload("GetPrivKeyFromMnemonic", mnemoic, keyName)
+	// PrintPayload("GetPrivKeyFromMnemonic", mnemoic, keyName)
 	kring := gosdk.Keyring
 	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, mnemoic, keyName)
 	if err != nil {
@@ -369,7 +369,7 @@ func GetPrivKeyFromMnemonic(mnemoic string, keyName string) []byte {
 
 //export GetAddressFromKeyName
 func GetAddressFromKeyName(keyName string) string {
-	PrintPayload("GetAddressFromKeyName", keyName)
+	// PrintPayload("GetAddressFromKeyName", keyName)
 	keyInfo, err := gosdk.Keyring.Key(keyName)
 	if err != nil {
 		logrus.Error("Failed to get address", err)
@@ -390,16 +390,12 @@ func GetAddressFromKeyName(keyName string) string {
 func ImportAccountFromMnemoic(mnemonic string, keyName string) int {
 	mnemonicStr := mnemonic
 	keyNameStr := keyName
-	PrintPayload("ImportAccountFromMnemoic", mnemonicStr, keyNameStr)
+	// PrintPayload("ImportAccountFromMnemoic", mnemonicStr, keyNameStr)
 	// Create a keyring
 	kring := gosdk.Keyring
-	signer, privateKey, err := gonibi.CreateSigner(mnemonicStr, kring, keyNameStr)
+	signer, _, err := gonibi.CreateSigner(mnemonicStr, kring, keyNameStr)
 	if err != nil {
 		logrus.Debug("Failed to import account:", err)
-		return Fail
-	}
-	if err := gonibi.AddSignerToKeyring(kring, privateKey, privateKey.PubKey().String()); err != nil {
-		logrus.Error("Can't assing singer to keyring: ", err)
 		return Fail
 	}
 	logrus.Printf("Susscess to import account: name: %s", signer.Name)
@@ -408,7 +404,7 @@ func ImportAccountFromMnemoic(mnemonic string, keyName string) int {
 
 //export ImportAccountFromPrivateKey
 func ImportAccountFromPrivateKey(privateKey []byte, keyName string) int {
-	PrintPayload("ImportAccountFromPrivateKey", keyName)
+	// PrintPayload("ImportAccountFromPrivateKey", keyName)
 	// Create a PrivKey instance and assign the decoded bytes to its Key field
 	privKey := secp256k1.PrivKey{
 		Key: privateKey,
@@ -445,16 +441,8 @@ func convertKeyInfo(key *keyring.Record) *KeyInfo {
 	keyInfo.Name = key.Name
 
 	// Copy the public key bytes
-	pubkey, err := key.GetPubKey()
-	if err != nil {
-		logrus.Error("Can't get public key")
-		return nil
-	}
+	pubkey, _ := key.GetPubKey()
 	pubKeyBytes := pubkey.Bytes()
-	if len(pubKeyBytes) > len(keyInfo.PubKey) {
-		logrus.Error("Public key too large")
-		return nil
-	}
 	copy(keyInfo.PubKey[:], pubKeyBytes)
 
 	// Copy the address bytes
@@ -464,10 +452,6 @@ func convertKeyInfo(key *keyring.Record) *KeyInfo {
 		return nil
 	}
 	addressBytes := address.Bytes()
-	if len(addressBytes) > len(keyInfo.Address) {
-		logrus.Error("Address too large")
-		return nil
-	}
 	copy(keyInfo.Address[:], addressBytes)
 
 	// Return the KeyInfo struct
@@ -476,7 +460,7 @@ func convertKeyInfo(key *keyring.Record) *KeyInfo {
 
 //export GetAccountByKeyName
 func GetAccountByKeyName(keyName string) *KeyInfo {
-	PrintPayload("GetAccountByKeyName", keyName)
+	// PrintPayload("GetAccountByKeyName", keyName)
 	keyInfo, err := gosdk.Keyring.Key(keyName)
 	if err != nil {
 		logrus.Error("GetAccountByKeyName Failed: ", err)
@@ -495,7 +479,7 @@ func GetAccountByKeyName(keyName string) *KeyInfo {
 
 //export GetAccountByAddress
 func GetAccountByAddress(addr string) *KeyInfo {
-	PrintPayload("GetAccountByAddress", addr)
+	// PrintPayload("GetAccountByAddress", addr)
 	address, err := sdk.AccAddressFromBech32(addr)
 	if err != nil {
 		logrus.Error("GetAccountByaddr Failed: ", err)
@@ -582,7 +566,7 @@ func DeleteAccount(keyName string, password string) int {
 //export TransferToken
 func TransferToken(fromAddress, toAddress, denom string, amount int) int {
 	logrus.Info("Call TransferToken")
-	PrintPayload("TransferToken", fromAddress, toAddress, denom, amount)
+	// PrintPayload("TransferToken", fromAddress, toAddress, denom, amount)
 	// Convert C strings to Go strings
 	fromStr := fromAddress
 	toStr := toAddress
@@ -677,8 +661,40 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom strin
 	return responseMsg.TxHash
 }
 
+func QueryWasmContract(contractAddress, queryMsg string) string {
+	// PrintPayload("QueryWasmContract", contractAddress, queryMsg)
+	// Convert C types to Go types
+	contractStr := contractAddress
+	msgStr := queryMsg
+
+	// Get the contract address
+	contract, err := sdk.AccAddressFromBech32(contractStr)
+	if err != nil {
+		logrus.Error("Failed to parse contract address:", err)
+		return ""
+	}
+
+	// Create the Wasm execute message
+	msgExe := &wasmtypes.QuerySmartContractStateRequest{
+		Address:   contract.String(),
+		QueryData: []byte(msgStr),
+	}
+
+	responseMsg, err := wasmClient.SmartContractState(context.Background(), msgExe)
+
+	if err != nil {
+		logrus.Error("Error SmartContractState", err)
+		return ""
+	}
+
+	logrus.Info("Response: ", responseMsg.String())
+
+	return responseMsg.String()
+}
+
 //export QueryTXHash
 func QueryTXHash(txHash string) string {
+	// PrintPayload("QueryTXHash", txHash)
 	decodedBytes, err := hex.DecodeString(txHash)
 
 	if err != nil {
@@ -694,5 +710,5 @@ func QueryTXHash(txHash string) string {
 	}
 
 	logrus.Info("Result: ", resultTx.TxResult.Log)
-	return resultTx.TxResult.Log
+	return resultTx.TxResult.String()
 }
