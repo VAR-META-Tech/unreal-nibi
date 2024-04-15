@@ -575,13 +575,9 @@ func ImportAccountFromMnemoic(mnemonic *C.char, keyName *C.char) C.int {
 	PrintPayload("ImportAccountFromMnemoic", mnemonicStr, keyNameStr)
 	// Create a keyring
 	kring := gosdk.Keyring
-	signer, privateKey, err := gonibi.CreateSigner(mnemonicStr, kring, keyNameStr)
+	signer, _, err := gonibi.CreateSigner(mnemonicStr, kring, keyNameStr)
 	if err != nil {
 		logrus.Debug("Failed to import account:", err)
-		return Fail
-	}
-	if err := gonibi.AddSignerToKeyring(kring, privateKey, privateKey.PubKey().String()); err != nil {
-		logrus.Error("Can't assing singer to keyring: ", err)
 		return Fail
 	}
 	logrus.Printf("Susscess to import account: name: %s", signer.Name)
@@ -791,6 +787,7 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 
 //export ExecuteWasmContract
 func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.char, amount C.int) *C.char {
+	PrintPayload("ExecuteWasmContract", C.GoString(senderAddress), C.GoString(contractAddress), C.GoString(executeMsg), C.GoString(denom), amount)
 	// Convert C types to Go types
 	fromStr := C.GoString(senderAddress)
 	contractStr := C.GoString(contractAddress)
@@ -838,6 +835,7 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.ch
 
 //export QueryWasmContract
 func QueryWasmContract(contractAddress, queryMsg *C.char) *C.char {
+	PrintPayload("QueryWasmContract", C.GoString(contractAddress), C.GoString(queryMsg))
 	// Convert C types to Go types
 	contractStr := C.GoString(contractAddress)
 	msgStr := C.GoString(queryMsg)
@@ -869,6 +867,7 @@ func QueryWasmContract(contractAddress, queryMsg *C.char) *C.char {
 
 //export QueryTXHash
 func QueryTXHash(txHash *C.char) *C.char {
+	PrintPayload("QueryTXHash", C.GoString(txHash))
 	decodedBytes, err := hex.DecodeString(C.GoString(txHash))
 
 	if err != nil {
