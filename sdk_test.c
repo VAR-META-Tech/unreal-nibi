@@ -23,7 +23,7 @@ int main()
 
     // Create key(private,public =>signner) from menemonic
     char *passPrares = "pass";
-    int createAdminAccount = CreateAccount(keyNameAdmin, adminPhases, passPrares);
+    int createAdminAccount = CreateAccount(keyNameAdmin, adminPhases, "");
     if (createAdminAccount != 0)
     {
         printf("Failed to create account\n");
@@ -45,7 +45,6 @@ int main()
 
     BaseAccount *baseAccAdmin = QueryAccount(adminAddress);
     BaseAccount *baseAcc = QueryAccount(address);
-
     int testTx = TransferToken(adminAddress, address, "unibi", 250);
     if (testTx != 0)
     {

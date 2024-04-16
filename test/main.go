@@ -8,6 +8,7 @@ import (
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/Unique-Divine/gonibi"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -341,16 +342,38 @@ func GenerateRecoveryPhrase() string {
 //export CreateAccount
 func CreateAccount(keyName string, mnemonic string, passphase string) int {
 	// PrintPayload("CreateAccount", keyName, mnemonic, passphase)
-	record, _, err := gonibi.CreateSigner(mnemonic, gosdk.Keyring, keyName)
+	algo := hd.Secp256k1
+
+	// Log the attempt to create a new account with the specified key name.
+	logrus.WithField("keyName", keyName).Info("Attempting to create new account")
+
+	// Create a new signer using the provided mnemonic and key name.
+	// record, _, err := gonibi.CreateSigner(mnemonicStr, gosdk.Keyring, keyNameStr)
+	record, err := gosdk.Keyring.NewAccount(keyName, mnemonic, passphase, sdk.GetConfig().GetFullBIP44Path(), algo)
 	if err != nil {
-		logrus.Debug("Failed to create new account", err)
+		logrus.WithFields(logrus.Fields{
+			"keyName": keyName,
+			"error":   err,
+		}).Error("Failed to create new account")
 		return Fail
 	}
 
-	addr, _ := record.GetAddress()
-	logrus.Printf("Account created with address: %s", addr.String())
+	// Obtain the address of the newly created account.
+	addr, err := record.GetAddress()
+	if err != nil {
+		logrus.WithError(err).Error("Failed to get address of the newly created account")
+		return Fail
+	}
 
+	// Log the successful account creation.
+	logrus.WithFields(logrus.Fields{
+		"keyName": keyName,
+		"address": addr.String(),
+	}).Info("Account created successfully")
+
+	// Optionally print the list of all signers for debugging.
 	PrintListSigners()
+
 	return Success
 }
 

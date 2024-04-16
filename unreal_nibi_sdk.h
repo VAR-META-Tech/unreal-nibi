@@ -145,7 +145,7 @@ extern char* GenerateRecoveryPhrase();
 // CreateAccount creates a new blockchain account using the provided mnemonic, key name, and passphrase.
 // It returns Success if the account creation is successful, otherwise Fail.
 //
-extern int CreateAccount(char* keyName, char* mnemonic, char* passphrase);
+extern int CreateAccount(char* keyname, char* mnemonic, char* passphrase);
 
 // GetPrivKeyFromMnemonic retrieves a private key from a given mnemonic and key name,
 // returning a pointer to the private key data in a C-compatible format.
