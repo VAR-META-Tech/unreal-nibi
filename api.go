@@ -793,60 +793,73 @@ func cUint8ToGoSlice(cData *C.uint8_t) []byte {
 	return goSlice
 }
 
+// GetAddressFromKeyName retrieves the blockchain address associated with a given key name.
+// It returns the address as a C string or nil if an error occurs.
+//
 //export GetAddressFromKeyName
 func GetAddressFromKeyName(keyName *C.char) *C.char {
-	PrintPayload("GetAddressFromKeyName", C.GoString(keyName))
-	keyInfo, err := gosdk.Keyring.Key(C.GoString(keyName))
-	if err != nil {
-		logrus.Error("Failed to get address", err)
-		return nil
-	}
-	addr, err := keyInfo.GetAddress()
-	if err != nil {
-		logrus.Error("Failed to get address", err)
-		return nil
-	}
-
-	logrus.Info("Return Address: ", addr.String())
-
-	return C.CString(addr.String())
-}
-
-//export ImportAccountFromMnemoic
-func ImportAccountFromMnemoic(mnemonic *C.char, keyName *C.char) C.int {
-	mnemonicStr := C.GoString(mnemonic)
 	keyNameStr := C.GoString(keyName)
-	PrintPayload("ImportAccountFromMnemoic", mnemonicStr, keyNameStr)
-	// Create a keyring
-	kring := gosdk.Keyring
-	signer, _, err := gonibi.CreateSigner(mnemonicStr, kring, keyNameStr)
+	PrintPayload("GetAddressFromKeyName", keyNameStr)
+
+	// Retrieve the key information from the keyring using the key name.
+	keyInfo, err := gosdk.Keyring.Key(keyNameStr)
 	if err != nil {
-		logrus.Debug("Failed to import account:", err)
-		return Fail
+		logrus.WithFields(logrus.Fields{
+			"keyName": keyNameStr,
+			"error":   err,
+		}).Error("Failed to retrieve key from keyring")
+		return nil
 	}
-	logrus.Printf("Susscess to import account: name: %s", signer.Name)
-	return Success
+
+	// Retrieve the address from the key information.
+	address, err := keyInfo.GetAddress()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"keyName": keyNameStr,
+			"error":   err,
+		}).Error("Failed to get address from key info")
+		return nil
+	}
+
+	// Log the retrieved address.
+	logrus.WithFields(logrus.Fields{
+		"keyName": keyNameStr,
+		"address": address.String(),
+	}).Info("Successfully retrieved address from key name")
+
+	// Return the address as a C string.
+	return C.CString(address.String())
 }
 
+// ImportAccountFromPrivateKey imports an account using a private key and associates it with a given key name.
+// It returns Success if the import is successful, otherwise Fail.
+//
 //export ImportAccountFromPrivateKey
 func ImportAccountFromPrivateKey(privateKey *C.uint8_t, keyName *C.char) C.int {
-	PrintPayload("ImportAccountFromPrivateKey", C.GoString(keyName))
-	// Decode the private key string from hex
+	keyNameStr := C.GoString(keyName)
+	PrintPayload("ImportAccountFromPrivateKey", keyNameStr)
+
+	// Convert C.uint8_t pointer to a Go byte slice
 	privKeyBytes := cUint8ToGoSlice(privateKey)
 	if privKeyBytes == nil {
-		logrus.Error("Can not get private key")
-	}
-
-	// Create a PrivKey instance and assign the decoded bytes to its Key field
-	privKey := secp256k1.PrivKey{
-		Key: privKeyBytes,
-	}
-	// Create a keyring
-	signer, err := gonibi.CreateSignerFromPrivKey(&privKey, C.GoString(keyName))
-	if err != nil {
+		logrus.Error("Failed to convert private key from C.uint8_t to Go slice")
 		return Fail
 	}
-	logrus.Info("Success to import account: ", signer.Name)
+
+	// Create a PrivKey instance with the private key bytes
+	privKey := secp256k1.PrivKey{Key: privKeyBytes}
+
+	// Attempt to create a signer from the private key
+	signer, err := gonibi.CreateSignerFromPrivKey(&privKey, keyNameStr)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"keyName": keyNameStr,
+			"error":   err,
+		}).Error("Failed to create signer from private key")
+		return Fail
+	}
+
+	logrus.WithField("keyName", signer.Name).Info("Successfully imported account")
 	return Success
 }
 
@@ -883,180 +896,290 @@ func GetListAccount(length *C.int) **C.KeyInfo {
 	return cKeyInfos
 }
 
+// GetAccountByKeyName retrieves account information by key name and returns it as a C.KeyInfo struct.
+//
 //export GetAccountByKeyName
 func GetAccountByKeyName(keyName *C.char) *C.KeyInfo {
-	PrintPayload("GetAccountByKeyName", C.GoString(keyName))
-	keyInfo, err := gosdk.Keyring.Key(C.GoString(keyName))
+	keyNameStr := C.GoString(keyName)
+	PrintPayload("GetAccountByKeyName", keyNameStr)
+
+	// Retrieve the key information from the keyring using the key name.
+	keyInfo, err := gosdk.Keyring.Key(keyNameStr)
 	if err != nil {
-		logrus.Error("GetAccountByKeyName Failed: ", err)
+		logrus.WithFields(logrus.Fields{
+			"keyName": keyNameStr,
+			"error":   err,
+		}).Error("Failed to retrieve account by key name")
 		return nil
 	}
 
-	logrus.Debug("Account find: ")
+	// Attempt to get the address from the key info.
 	addr, err := keyInfo.GetAddress()
 	if err != nil {
-		logrus.Error("GetAccountByKeyName Failed to get dddress: ", err)
+		logrus.WithFields(logrus.Fields{
+			"keyName": keyNameStr,
+			"error":   err,
+		}).Error("Failed to get address from key info")
 		return nil
 	}
-	logrus.Infof("Name: %s\nPubkey: %s\n address: %s", keyInfo.Name, keyInfo.PubKey, addr.String())
+
+	// Log details about the account.
+	logrus.WithFields(logrus.Fields{
+		"keyName": keyNameStr,
+		"pubKey":  keyInfo.PubKey,
+		"address": addr.String(),
+	}).Debug("Account details retrieved successfully")
+
+	// Convert the key information to a C-compatible structure and return it.
 	return convertKeyInfo(keyInfo)
 }
 
+// GetAccountByAddress retrieves account information based on the blockchain address and returns it as a C.KeyInfo struct.
+//
 //export GetAccountByAddress
 func GetAccountByAddress(addr *C.char) *C.KeyInfo {
-	PrintPayload("GetAccountByAddress", C.GoString(addr))
-	address, err := sdk.AccAddressFromBech32(C.GoString(addr))
+	addressStr := C.GoString(addr)
+	PrintPayload("GetAccountByAddress", addressStr)
+
+	// Convert the C string to a Go string and parse the address.
+	address, err := sdk.AccAddressFromBech32(addressStr)
 	if err != nil {
-		logrus.Error("GetAccountByaddr Failed: ", err)
-		return nil
-	}
-	logrus.Printf("C address: %s, niburu address: %s", C.GoString(addr), address)
-	keyInfo, err := gosdk.Keyring.KeyByAddress(address)
-	if err != nil {
-		logrus.Error("GetAccountByaddr Failed: ", err)
+		logrus.WithFields(logrus.Fields{
+			"address": addressStr,
+			"error":   err,
+		}).Error("Failed to parse account address")
 		return nil
 	}
 
+	logrus.Printf("C address: %s, Nibiru address: %s", addressStr, address)
+
+	// Retrieve the key information from the keyring by address.
+	keyInfo, err := gosdk.Keyring.KeyByAddress(address)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"address": address.String(),
+			"error":   err,
+		}).Error("Failed to retrieve account by address")
+		return nil
+	}
+
+	// Convert the key information to a C-compatible struct and return it.
 	return convertKeyInfo(keyInfo)
 }
 
+// HasKeyByName checks if a key with the specified name exists in the keyring.
+// It returns Success if the key exists, otherwise Fail.
+//
 //export HasKeyByName
 func HasKeyByName(name *C.char) C.int {
-	logrus.Debug("Call HasKeyByName")
-	has, err := gosdk.Keyring.Key(C.GoString(name))
+	logrus.Debug("Checking for key by name")
+
+	// Convert the C string to a Go string.
+	keyName := C.GoString(name)
+
+	// Attempt to retrieve the key from the keyring.
+	_, err := gosdk.Keyring.Key(keyName)
 	if err != nil {
-		logrus.Error("HasKeyByName Fail: ", err)
+		// Logging the error along with the key name for better context.
+		logrus.WithFields(logrus.Fields{
+			"keyName": keyName,
+			"error":   err,
+		}).Error("Failed to find key by name")
 		return Fail
 	}
 
-	if has != nil {
-		return Success
-	} else {
-		return Fail
-	}
+	// If the key retrieval is successful, log the success and return Success.
+	logrus.WithField("keyName", keyName).Debug("Key found")
+	return Success
 }
 
+// HasKeyByAddress checks if a key corresponding to the given address exists in the keyring.
+// It returns Success if the key exists, otherwise Fail.
+//
 //export HasKeyByAddress
-func HasKeyByAddress(addr *C.char, len C.int) C.int {
-	logrus.Debug("Call HasKeyByAddres")
-	address, err := sdk.AccAddressFromBech32(C.GoString(addr))
+func HasKeyByAddress(addr *C.char) C.int {
+	logrus.Debug("Checking for key by address")
+
+	// Convert C string to Go string and parse the address.
+	addressStr := C.GoString(addr)
+	address, err := sdk.AccAddressFromBech32(addressStr)
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"address": addressStr,
+			"error":   err,
+		}).Error("Invalid address format")
 		return Fail
 	}
 
+	// Check for the key in the keyring by address.
 	a, err := gosdk.Keyring.KeyByAddress(address)
 	if err != nil {
-		logrus.Error("GetAccountByAddr Fail: ", err)
+		logrus.WithFields(logrus.Fields{
+			"address": address.String(),
+			"error":   err,
+		}).Error("Failed to retrieve key by address")
 		return Fail
 	}
 
+	// If a key is found, log the key name and return Success.
 	if a != nil {
-		logrus.Debug("Key Name: ", a.Name)
+		logrus.WithField("keyName", a.Name).Debug("Key found")
 		return Success
-	} else {
-		return Fail
 	}
+
+	// If no key is found, return Fail.
+	return Fail
 }
 
+// PrintListSigners logs the list of all signers in the keyring.
 func PrintListSigners() {
-	logrus.Debug("Call GetListAccount")
+	logrus.Debug("Attempting to retrieve list of accounts from keyring")
+
+	// Retrieve the list of signers from the keyring
 	signers, err := gosdk.Keyring.List()
 	if err != nil {
-		logrus.Debug("Error can't get list signer:", err)
+		logrus.WithError(err).Debug("Failed to retrieve signers from keyring")
+		return
 	}
 
+	// Log each signer's details
 	for _, signer := range signers {
-
 		addr, err := signer.GetAddress()
 		if err != nil {
-			logrus.Error("GetAccountByKeyName Failed to get address: ", err)
+			logrus.WithFields(logrus.Fields{
+				"signerName": signer.Name,
+				"error":      err,
+			}).Error("Failed to get address for signer")
+			continue
 		}
-		logrus.Infof("Name: %s\n address: %s", signer.Name, addr.String())
+		logrus.WithFields(logrus.Fields{
+			"signerName": signer.Name,
+			"address":    addr.String(),
+		}).Info("Signer details")
 	}
 }
 
+// DeleteAccount removes an account from the keyring based on the given key name.
+//
 //export DeleteAccount
 func DeleteAccount(keyName *C.char, password *C.char) C.int {
-	logrus.Debug("Call DeleteAccount")
+	// Log the attempt to delete an account
+	logrus.Debug("Attempting to delete account with key name")
 
-	err := gosdk.Keyring.Delete(C.GoString(keyName))
+	// Convert C char to Go string and attempt to delete the account
+	keyNameStr := C.GoString(keyName)
+	err := gosdk.Keyring.Delete(keyNameStr)
 	if err != nil {
-		logrus.Debug("Error:", err)
+		// Log failure with error
+		logrus.WithField("keyName", keyNameStr).WithError(err).Debug("Failed to delete account")
 		return Fail
 	}
+
+	// Log success and optionally print the list of remaining signers
+	logrus.WithField("keyName", keyNameStr).Debug("Account successfully deleted")
 	PrintListSigners()
 	return Success
 }
 
+// TransferToken transfers specified amount of tokens from one address to another.
+// It returns Success if the transaction is successful, otherwise Fail.
+//
 //export TransferToken
 func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
-	logrus.Info("Call TransferToken")
-	PrintPayload("TransferToken", C.GoString(fromAddress), C.GoString(toAddress), C.GoString(denom), amount)
+	logrus.Info("Initiating token transfer")
 	// Convert C strings to Go strings
 	fromStr := C.GoString(fromAddress)
 	toStr := C.GoString(toAddress)
 	denomStr := C.GoString(denom)
+
+	// Log the initiation of the transfer with relevant data
+	logrus.WithFields(logrus.Fields{
+		"from":   fromStr,
+		"to":     toStr,
+		"denom":  denomStr,
+		"amount": amount,
+	}).Info("Transfer details")
+
+	// Print account information before the transaction
 	PrintBaseAccountInfo(fromStr, toStr)
 
-	// Get the sender's address
+	// Parse the sender's address
 	from, err := sdk.AccAddressFromBech32(fromStr)
 	if err != nil {
-		logrus.Error("Can't get fromAddress", err)
+		logrus.WithError(err).WithField("fromAddress", fromStr).Error("Failed to parse sender address")
 		return Fail
 	}
 
-	// Get the recipient's address
+	// Parse the recipient's address
 	to, err := sdk.AccAddressFromBech32(toStr)
 	if err != nil {
-		logrus.Error("Can't get toAddress", err)
+		logrus.WithError(err).WithField("toAddress", toStr).Error("Failed to parse recipient address")
 		return Fail
 	}
 
 	// Create a coin with the specified denomination and amount
-	coin := sdk.NewCoins(sdk.NewInt64Coin(denomStr, int64(amount)))
+	coins := sdk.NewCoins(sdk.NewCoin(denomStr, sdk.NewInt(int64(amount))))
 
 	// Create a MsgSend message to transfer tokens
-	msgSend := banktypes.NewMsgSend(from, to, coin)
-	defer PrintBaseAccountInfo(fromStr, toStr)
+	msgSend := banktypes.NewMsgSend(from, to, coins)
+
 	// Broadcast the transaction to the blockchain network
 	_, err = gosdk.BroadcastMsgs(from, msgSend)
-
 	if err != nil {
-		logrus.Error("Error BroadcastMsgs", err)
+		logrus.WithError(err).Error("Failed to broadcast token transfer message")
 		return Fail
 	}
+
+	// Print account information after the transaction
+	defer PrintBaseAccountInfo(fromStr, toStr)
+
+	logrus.WithFields(logrus.Fields{
+		"from": fromStr,
+		"to":   toStr,
+	}).Info("Token transfer executed successfully")
 
 	return Success
 }
 
+// ExecuteWasmContract executes a smart contract on the blockchain using the specified parameters.
+// It returns a pointer to a C string containing the transaction hash, or nil if an error occurs.
+//
 //export ExecuteWasmContract
 func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.char, amount C.int) *C.char {
+	// Log the incoming payload for debug purposes.
 	PrintPayload("ExecuteWasmContract", C.GoString(senderAddress), C.GoString(contractAddress), C.GoString(executeMsg), C.GoString(denom), amount)
-	// Convert C types to Go types
+
+	// Convert C types to Go types.
 	fromStr := C.GoString(senderAddress)
 	contractStr := C.GoString(contractAddress)
 	msgStr := C.GoString(executeMsg)
 	denomStr := C.GoString(denom)
 	amountInt := sdk.NewInt(int64(amount))
 
-	// Get the sender's address
+	// Parse sender's address.
 	from, err := sdk.AccAddressFromBech32(fromStr)
 	if err != nil {
-		logrus.Error("Failed to parse sender address:", err)
+		logrus.WithFields(logrus.Fields{
+			"senderAddress": fromStr,
+			"error":         err,
+		}).Error("Failed to parse sender address")
 		return nil
 	}
 
-	// Get the contract address
+	// Parse contract address.
 	contract, err := sdk.AccAddressFromBech32(contractStr)
 	if err != nil {
-		logrus.Error("Failed to parse contract address:", err)
+		logrus.WithFields(logrus.Fields{
+			"contractAddress": contractStr,
+			"error":           err,
+		}).Error("Failed to parse contract address")
 		return nil
 	}
 
-	// Create the coins to send with the message
+	// Create the coins to send with the message.
 	coins := sdk.NewCoins(sdk.NewCoin(denomStr, amountInt))
 
-	// Create the Wasm execute message
+	// Construct the Wasm execute message.
 	msgExe := &wasmtypes.MsgExecuteContract{
 		Sender:   from.String(),
 		Contract: contract.String(),
@@ -1064,49 +1187,75 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.ch
 		Funds:    coins,
 	}
 
-	// Broadcast the transaction to the blockchain network
+	// Broadcast the transaction to the blockchain network.
 	responseMsg, err := gosdk.BroadcastMsgs(from, msgExe)
-
 	if err != nil {
-		logrus.Error("Error BroadcastMsgs", err)
+		logrus.WithFields(logrus.Fields{
+			"sender":   fromStr,
+			"contract": contractStr,
+			"error":    err,
+		}).Error("Failed to broadcast execute contract message")
 		return nil
 	}
 
-	logrus.Info("Response: ", string(responseMsg.String()))
+	// Log the response transaction hash.
+	txHash := responseMsg.TxHash
+	logrus.WithFields(logrus.Fields{
+		"txHash": txHash,
+	}).Info("Executed contract successfully")
 
-	return C.CString(responseMsg.TxHash)
+	// Return the transaction hash as a C string.
+	return C.CString(txHash)
 }
 
+// QueryWasmContract queries the state of a Wasm smart contract using a contract address and a query message.
+// It returns a pointer to a C string containing the query response or nil if an error occurs.
+//
 //export QueryWasmContract
 func QueryWasmContract(contractAddress, queryMsg *C.char) *C.char {
+	// Log the payload for debugging purposes.
 	PrintPayload("QueryWasmContract", C.GoString(contractAddress), C.GoString(queryMsg))
-	// Convert C types to Go types
+
+	// Convert C types to Go types for further processing.
 	contractStr := C.GoString(contractAddress)
 	msgStr := C.GoString(queryMsg)
 
-	// Get the contract address
+	// Parse the contract address.
 	contract, err := sdk.AccAddressFromBech32(contractStr)
 	if err != nil {
-		logrus.Error("Failed to parse contract address:", err)
+		logrus.WithFields(logrus.Fields{
+			"contractAddress": contractStr,
+			"error":           err,
+		}).Error("Failed to parse contract address")
 		return nil
 	}
 
-	// Create the Wasm execute message
+	// Create the Wasm execute message.
 	msgExe := &wasmtypes.QuerySmartContractStateRequest{
 		Address:   contract.String(),
 		QueryData: []byte(msgStr),
 	}
 
+	// Perform the smart contract state query.
 	responseMsg, err := wasmClient.SmartContractState(context.Background(), msgExe)
-
 	if err != nil {
-		logrus.Error("Error SmartContractState", err)
+		logrus.WithFields(logrus.Fields{
+			"contractAddress": contractStr,
+			"query":           msgStr,
+			"error":           err,
+		}).Error("Failed to query smart contract state")
 		return nil
 	}
 
-	logrus.Info("Response: ", string(responseMsg.String()))
+	// Convert the response to a string and log it.
+	responseStr := responseMsg.String()
+	logrus.WithFields(logrus.Fields{
+		"contractAddress": contractStr,
+		"response":        responseStr,
+	}).Info("Smart contract state queried successfully")
 
-	return C.CString(responseMsg.String())
+	// Return the response as a C string.
+	return C.CString(responseStr)
 }
 
 // QueryTXHash retrieves the transaction details corresponding to a given transaction hash.

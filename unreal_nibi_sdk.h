@@ -151,17 +151,53 @@ extern int CreateAccount(char* keyname, char* mnemonic, char* passphrase);
 // returning a pointer to the private key data in a C-compatible format.
 //
 extern uint8_t* GetPrivKeyFromMnemonic(char* mnemonic, char* keyName);
+
+// GetAddressFromKeyName retrieves the blockchain address associated with a given key name.
+// It returns the address as a C string or nil if an error occurs.
+//
 extern char* GetAddressFromKeyName(char* keyName);
-extern int ImportAccountFromMnemoic(char* mnemonic, char* keyName);
+
+// ImportAccountFromPrivateKey imports an account using a private key and associates it with a given key name.
+// It returns Success if the import is successful, otherwise Fail.
+//
 extern int ImportAccountFromPrivateKey(uint8_t* privateKey, char* keyName);
 extern KeyInfo** GetListAccount(int* length);
+
+// GetAccountByKeyName retrieves account information by key name and returns it as a C.KeyInfo struct.
+//
 extern KeyInfo* GetAccountByKeyName(char* keyName);
+
+// GetAccountByAddress retrieves account information based on the blockchain address and returns it as a C.KeyInfo struct.
+//
 extern KeyInfo* GetAccountByAddress(char* addr);
+
+// HasKeyByName checks if a key with the specified name exists in the keyring.
+// It returns Success if the key exists, otherwise Fail.
+//
 extern int HasKeyByName(char* name);
-extern int HasKeyByAddress(char* addr, int len);
+
+// HasKeyByAddress checks if a key corresponding to the given address exists in the keyring.
+// It returns Success if the key exists, otherwise Fail.
+//
+extern int HasKeyByAddress(char* addr);
+
+// DeleteAccount removes an account from the keyring based on the given key name.
+//
 extern int DeleteAccount(char* keyName, char* password);
+
+// TransferToken transfers specified amount of tokens from one address to another.
+// It returns Success if the transaction is successful, otherwise Fail.
+//
 extern int TransferToken(char* fromAddress, char* toAddress, char* denom, int amount);
+
+// ExecuteWasmContract executes a smart contract on the blockchain using the specified parameters.
+// It returns a pointer to a C string containing the transaction hash, or nil if an error occurs.
+//
 extern char* ExecuteWasmContract(char* senderAddress, char* contractAddress, char* executeMsg, char* denom, int amount);
+
+// QueryWasmContract queries the state of a Wasm smart contract using a contract address and a query message.
+// It returns a pointer to a C string containing the query response or nil if an error occurs.
+//
 extern char* QueryWasmContract(char* contractAddress, char* queryMsg);
 
 // QueryTXHash retrieves the transaction details corresponding to a given transaction hash.
