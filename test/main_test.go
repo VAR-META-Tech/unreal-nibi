@@ -82,7 +82,7 @@ func (s *MainTestSuite) GenerateRecoveryPhrase() {
 
 // Test CreateAccount
 func (s *MainTestSuite) TestCreateAccount() {
-	phrase := GenerateRecoveryPhrase()
+	phrase := "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host"
 	check := CreateAccount("test_key", phrase, "pass")
 	s.Equal(0, check)
 }
