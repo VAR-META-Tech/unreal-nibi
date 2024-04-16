@@ -16,39 +16,45 @@ void UNibiruLogic::OnInitApp()
     }
 }
 
-void UNibiruLogic::OnCreateWalletClicked(FString &menomonic_key_return, FString &privkey_key_return, FString &adress_key_return, bool &IsCreateOk)
+void UNibiruLogic::OnCreateWalletClicked(FString &address_key_return, FString &admin_address_key_return, bool &IsCreateOk, FString &error_return)
 {
     IsCreateOk = false;
-    menomonic_key_return = "";
-    privkey_key_return = "";
-    adress_key_return = "";
+    error_return = "";
+    admin_address_key_return = "";
+    address_key_return = "";
 
-    char *keyName = strdup("name");
+    char *keyNameAdmin = strdup("AdminKey");
+    char *keyName = strdup("TestKey");
     // Create new wallet
     // Generate Menomonic
-    char *menomonic = GenerateRecoveryPhrase();
-    printf("Prases: %s", menomonic);
+    char *prases = strdup("napkin rigid magnet grass plastic spawn replace hobby tray eternal pupil olive pledge nasty animal base bitter climb guess analyst fat neglect zoo earn");
+    char *adminPhases = strdup("guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host");
 
     // Create key(private,public =>signner) from menemonic
-    int createAccount = CreateAccount(keyName, menomonic);
-    if (createAccount != 0)
+    char *passPrares = strdup("pass");
+    int createAdminAccount = CreateAccount(keyNameAdmin, adminPhases, passPrares);
+    if (createAdminAccount != 0)
     {
+        error_return = "Failed to create admin account";
         printf("Failed to create account\n");
         return;
     }
 
+    int createAccount = CreateAccount(keyName, prases, passPrares);
+    if (createAccount != 0)
+    {
+        error_return = "Failed to create account";
+        printf("Failed to create account\n");
+        return;
+    }
+    IsCreateOk = true;
     // Get wallet address
-    int address = GetAddressFromMnemonic(menomonic, keyName);
-    if (address != 0)
-    {
-        printf("Failed to get private key\n");
-        return;
-    }
+    // Get account address
+    char *address = GetAddressFromKeyName(keyName);
+    char *adminAddress = GetAddressFromKeyName(keyNameAdmin);
 
-    int privkey = GetPrivKeyFromMnemonic(menomonic, keyName);
-    if (privkey != 0)
-    {
-        printf("Failed to get private key\n");
-        return;
-    }
+    printf("Admin Address: %s\n", adminAddress);
+    printf("Account Address: %s\n", address);
+    admin_address_key_return = adminAddress;
+    address_key_return = address;
 }
