@@ -18,7 +18,7 @@ int main()
     char *keyName = "TestKey";
     // Create new wallet
     // Generate Menomonic
-    char *prases = "napkin rigid magnet grass plastic spawn replace hobby tray eternal pupil olive pledge nasty animal base bitter climb guess analyst fat neglect zoo earn";
+    char *testMnemonic = "napkin rigid magnet grass plastic spawn replace hobby tray eternal pupil olive pledge nasty animal base bitter climb guess analyst fat neglect zoo earn";
     char *adminPhases = "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host";
 
     // Create key(private,public =>signner) from menemonic
@@ -29,7 +29,7 @@ int main()
         printf("Failed to create account\n");
         return 1;
     }
-    int createAccount = CreateAccount(keyName, prases, passPrares);
+    int createAccount = CreateAccount(keyName, testMnemonic, passPrares);
     if (createAccount != 0)
     {
         printf("Failed to create account\n");
