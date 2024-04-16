@@ -47,6 +47,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"time"
 	"unsafe"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -64,6 +65,12 @@ func main() {
 
 }
 
+// Constants to represent the success or failure of functions.
+const (
+	Success = 0 // Success indicates that the function completed its task without errors.
+	Fail    = 1 // Fail indicates that the function encountered an error and did not complete successfully.
+)
+
 type NetworkInfo struct {
 	GrpcEndpoint      string
 	LcdEndpoint       string
@@ -76,9 +83,9 @@ var (
 	LocalNetworkInfo = NetworkInfo{
 		GrpcEndpoint:      "localhost:9090",
 		LcdEndpoint:       "http://localhost:1317",
-		TmRpcEndpoint:     "https://rpc.nibiru.fi:443",
+		TmRpcEndpoint:     "http://localhost:26657",
 		WebsocketEndpoint: "ws://localhost:26657/websocket",
-		ChainID:           "cataclysm-1",
+		ChainID:           "nibiru-localnet-0",
 	}
 	DevNetworkInfo = NetworkInfo{
 		GrpcEndpoint:      "tcp://grpc.devnet-2.nibiru.fi:443",
@@ -99,7 +106,7 @@ var (
 		LcdEndpoint:       "https://lcd.nibiru.fi",
 		TmRpcEndpoint:     "https://rpc.nibiru.fi:443",
 		WebsocketEndpoint: "wss://rpc.nibiru.fi/websocket",
-		ChainID:           "nibiru-localnet-0",
+		ChainID:           "cataclysm-1",
 	}
 )
 
@@ -116,305 +123,508 @@ var wasmClient wasmtypes.QueryClient
 var networkInfo NetworkInfo
 
 func InitClients() error {
+	// Initialize clients for respective services using the global gosdk instance
 	authClient = authtypes.NewQueryClient(gosdk.Querier.ClientConn)
 	bankClient = banktypes.NewQueryClient(gosdk.Querier.ClientConn)
 	wasmClient = wasmtypes.NewQueryClient(gosdk.Querier.ClientConn)
+
+	// Check if any client initialization failed
 	if authClient == nil || bankClient == nil || wasmClient == nil {
+		logrus.Error("Failed to initialize one or more clients")
 		return errors.New("can't init client")
 	}
+	logrus.Info("Clients initialized successfully")
 	return nil
 }
 
 func PrintPayload(funcName string, args ...interface{}) {
-	// Log the function name
-	logrus.WithField("Name", funcName).Info("\n\nCall function")
+	logrus.WithField("Function", funcName).Info("Function call started")
 
-	// Log the function parameters
+	// Log each argument passed to the function
 	for i, arg := range args {
-		logrus.WithFields(logrus.Fields{"arg": i, "value": fmt.Sprintf("%v", arg)}).Debug("Parameter")
+		logrus.WithFields(logrus.Fields{
+			"argument index": i,
+			"value":          fmt.Sprintf("%v", arg),
+		}).Debug("Function parameter")
 	}
 }
+
 func init() {
+	// Set up the logging format and level.
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
+
+	// Set the initial network information to local settings.
 	networkInfo = LocalNetworkInfo
 
-	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, false, 2)
+	// Attempt to establish a gRPC connection using the local network configuration.
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
 	if err != nil {
-		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		logrus.WithError(err).Fatalf("Failed to initialize gRPC connection with endpoint %s", networkInfo.GrpcEndpoint)
+	} else {
+		logrus.WithField("endpoint", networkInfo.GrpcEndpoint).Info("gRPC connection established successfully")
 	}
 
+	// Initialize the Nibiru client with the obtained gRPC connection.
 	gosdk, err = gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
 	if err != nil {
-		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		logrus.WithError(err).Fatalf("Failed to initialize Nibiru client for chain ID %s", networkInfo.ChainID)
+	} else {
+		logrus.WithFields(logrus.Fields{
+			"chainID":     networkInfo.ChainID,
+			"rpcEndpoint": networkInfo.TmRpcEndpoint,
+		}).Info("Nibiru client initialized successfully")
 	}
 
+	// Initialize clients for auth, bank, and wasm modules.
 	if err := InitClients(); err != nil {
-		logrus.Println("[ERR] ", err)
+		logrus.WithError(err).Error("Failed to initialize clients")
+	} else {
+		logrus.Info("All clients initialized successfully")
 	}
-	logrus.Println("[init] Nibiru client initialized")
+
+	// Confirm the package initialization is complete.
+	logrus.Info("Package initialization completed successfully")
 }
 
+// SwitchNetwork changes the network configuration based on the provided network name.
+// It returns Success (0) if the switch is successful, otherwise Fail (1).
+//
 //export SwitchNetwork
 func SwitchNetwork(network *C.char) C.int {
-	logrus.Info("Call SwitchNetwork")
+	// Convert C string to Go string
 	networkStr := C.GoString(network)
+	logrus.WithField("network", networkStr).Info("Attempting to switch network")
+
+	// Determine the appropriate network settings based on the input
+	var grpcInsecure bool
 	switch networkStr {
 	case "local":
 		networkInfo = LocalNetworkInfo
+		grpcInsecure = true
 	case "dev":
 		networkInfo = DevNetworkInfo
+		grpcInsecure = false
 	case "test":
 		networkInfo = TestNetworkInfo
+		grpcInsecure = false
 	case "main":
 		networkInfo = MainNetworkInfo
+		grpcInsecure = false
 	default:
+		logrus.WithField("network", networkStr).Warn("Unknown network specified, defaulting to test network")
 		networkInfo = TestNetworkInfo
+		grpcInsecure = false
 	}
-	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, false, 2)
+
+	// Establish a new gRPC connection with the updated network settings
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, grpcInsecure, 2)
 	if err != nil {
-		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		logrus.WithFields(logrus.Fields{
+			"endpoint": networkInfo.GrpcEndpoint,
+			"error":    err,
+		}).Error("Failed to initialize gRPC connection")
 		return Fail
 	}
 
+	// Initialize the Nibiru client with the new gRPC connection
 	gosdk, err = gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
 	if err != nil {
-		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		logrus.WithFields(logrus.Fields{
+			"chainID":     networkInfo.ChainID,
+			"rpcEndpoint": networkInfo.TmRpcEndpoint,
+			"error":       err,
+		}).Error("Failed to initialize Nibiru client")
 		return Fail
 	}
 
-	logrus.Info("Switch to network: ", networkStr)
+	logrus.WithField("network", networkStr).Info("Network switched successfully")
 
+	// Reinitialize the clients to ensure they use the new network configuration
 	if err := InitClients(); err != nil {
-		logrus.Error("Init client err: ", err)
+		logrus.WithError(err).Error("Failed to initialize clients after network switch")
 		return Fail
 	}
+
 	return Success
 }
 
-const (
-	Success = 0
-	Fail    = 1
-)
-
 // Niburu method
+// GetAccountInfo retrieves the account information for a given blockchain address.
+// It returns an AccountI interface and any error encountered during the retrieval or unpacking process.
+func GetAccountInfo(address string) (authtypes.AccountI, error) {
+	// Log the function call with the address parameter for debugging purposes.
+	PrintPayload("GetAccountInfo", address)
 
-func GetAccountInfo(
-	address string,
-) (account authtypes.AccountI, err error) {
+	// Create a context with a timeout to ensure the request does not hang indefinitely.
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	acc, err := authClient.Account(context.Background(), &authtypes.QueryAccountRequest{
+	// Request account information from the blockchain using the address.
+	acc, err := authClient.Account(ctx, &authtypes.QueryAccountRequest{
 		Address: address,
 	})
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"address": address,
+			"error":   err,
+		}).Error("Failed to get account info from the blockchain")
 		return nil, err
 	}
-	var accountI authtypes.AccountI
-	gosdk.EncCfg.InterfaceRegistry.UnpackAny(acc.Account, &accountI)
-	return accountI, nil
+
+	// Unpack the account information from the blockchain's response into a generic interface.
+	var account authtypes.AccountI
+	err = gosdk.EncCfg.InterfaceRegistry.UnpackAny(acc.Account, &account)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"address": address,
+			"error":   err,
+		}).Error("Failed to unpack account info")
+		return nil, err
+	}
+
+	// Log the successfully fetched and unpacked account information.
+	logrus.WithFields(logrus.Fields{
+		"account number": account.GetAccountNumber(),
+		"sequence":       account.GetSequence(),
+		"address":        address,
+	}).Info("Account information retrieved and unpacked successfully")
+
+	return account, nil
 }
 
-func GetListAccountInfo() (accouns []authtypes.AccountI, err error) {
-
+// GetListAccountInfo retrieves a list of all accounts from the blockchain.
+// It returns a slice of AccountI interfaces and any error encountered during the operation.
+func GetListAccountInfo() ([]authtypes.AccountI, error) {
+	// Initialize the query client using the existing gRPC connection.
 	queryClient := authtypes.NewQueryClient(gosdk.Querier.ClientConn)
-	resp, err := queryClient.Accounts(context.Background(), &authtypes.QueryAccountsRequest{})
+
+	// Create a context with a timeout to prevent the function from hanging indefinitely.
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Request a list of all accounts from the blockchain.
+	resp, err := queryClient.Accounts(ctx, &authtypes.QueryAccountsRequest{})
 	if err != nil {
-		return accouns, err
+		logrus.WithError(err).Error("Failed to fetch accounts from the blockchain")
+		return nil, err
 	}
-	// register auth interface
-	var accounts []authtypes.AccountI
+
+	// Initialize a slice to hold the unpacked accounts.
+	accounts := make([]authtypes.AccountI, 0, len(resp.Accounts))
+
+	// Unpack each account and append to the accounts slice.
 	for _, v := range resp.Accounts {
 		var acc authtypes.AccountI
-		gosdk.EncCfg.InterfaceRegistry.UnpackAny(v, &acc)
-		if v != nil {
-			accounts = append(accounts, acc)
+		if err := gosdk.EncCfg.InterfaceRegistry.UnpackAny(v, &acc); err != nil {
+			logrus.WithFields(logrus.Fields{
+				"account": v,
+				"error":   err,
+			}).Error("Failed to unpack account info")
+			continue // Skip this account and continue with others
 		}
+		accounts = append(accounts, acc)
 	}
+
+	logrus.WithField("totalAccounts", len(accounts)).Info("All accounts fetched and unpacked successfully")
 	return accounts, nil
 }
 
-func GetAccountCoins(
-	address string,
-) (sdk.Coins, error) {
+// GetAccountCoins retrieves all coin balances associated with a given blockchain address.
+// It returns a list of coins and any error encountered during the operation.
+func GetAccountCoins(address string) (sdk.Coins, error) {
+	// Log the function call with the address parameter to trace execution flow.
 	PrintPayload("GetAccountCoins", address)
-	resp, err := bankClient.AllBalances(context.Background(), &banktypes.QueryAllBalancesRequest{
+
+	// Create a context with a timeout to ensure the request does not hang indefinitely.
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Request the balance information from the blockchain using the address.
+	resp, err := bankClient.AllBalances(ctx, &banktypes.QueryAllBalancesRequest{
 		Address: address,
 	})
-	logrus.Debug(resp.String())
 	if err != nil {
-		logrus.Error("Can't get account coin")
+		logrus.WithFields(logrus.Fields{
+			"address": address,
+			"error":   err,
+		}).Error("Failed to retrieve account balances")
 		return nil, err
 	}
+
+	// Log the response for debugging purposes. This is especially useful for verifying the correct response format.
+	logrus.WithFields(logrus.Fields{
+		"address":  address,
+		"balances": resp.Balances.String(),
+	}).Debug("Account balances retrieved successfully")
+
 	return resp.Balances, nil
 }
+
+// PrintBaseAccountInfo fetches and logs basic information for a list of blockchain addresses.
 func PrintBaseAccountInfo(addrs ...string) {
+	// Iterate through all provided addresses
 	for _, addr := range addrs {
+		// Fetch account information using the address
 		account, err := GetAccountInfo(addr)
 		if err != nil {
-			logrus.Error("Account not found: ", err)
-		} else {
-			accountCoin, err := GetAccountCoins(addr)
-			if err != nil {
-				logrus.Error("Account coin not found: ", err)
-			} else {
-				logrus.Info("Account Info Of Address: ", addr)
-				logrus.Info("Account Number: ", account.GetAccountNumber())
-				logrus.Info("Account Sequence: ", account.GetSequence())
-				logrus.Info("Account Denoms: ", accountCoin.Denoms())
-				logrus.Info("Account Coin: ", accountCoin.String())
-			}
+			logrus.WithFields(logrus.Fields{
+				"address": addr,
+				"error":   err,
+			}).Error("Failed to get account information")
+			continue // Skip to the next address if the current one fails
 		}
+
+		// Fetch coin balances associated with the account
+		accountCoin, err := GetAccountCoins(addr)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"address": addr,
+				"error":   err,
+			}).Error("Failed to get account coin balances")
+			continue // Skip to the next address if the current one fails
+		}
+
+		// Log the fetched account information
+		logrus.WithFields(logrus.Fields{
+			"address":      addr,
+			"accountNum":   account.GetAccountNumber(),
+			"sequence":     account.GetSequence(),
+			"coinDenoms":   accountCoin.Denoms(),
+			"coinBalances": accountCoin.String(),
+		}).Info("Account information retrieved successfully")
 	}
 }
 
+// QueryAccount retrieves detailed account information given a blockchain address and returns a C-compatible structure.
+//
 //export QueryAccount
 func QueryAccount(address *C.char) *C.BaseAccount {
+	// Log the function call with the address parameter to trace execution flow.
 	PrintPayload("QueryAccount", C.GoString(address))
 
-	addr, err := sdk.AccAddressFromBech32(C.GoString(address))
+	// Convert C string to Go string and validate the address format.
+	addrStr := C.GoString(address)
+	_, err := sdk.AccAddressFromBech32(addrStr)
 	if err != nil {
-		logrus.Error("GetAccountByaddr Failed: ", err)
+		logrus.WithError(err).WithField("address", addrStr).Error("Invalid blockchain address format")
 		return nil
 	}
-	account, err := GetAccountInfo(C.GoString(address))
+
+	// Fetch the account information from the blockchain.
+	account, err := GetAccountInfo(addrStr)
 	if err != nil {
-		logrus.Error("Account not found: ", err)
+		logrus.WithError(err).WithField("address", addrStr).Error("Failed to get account information")
 		return nil
 	}
 
-	logrus.Info("QueryAccount ~ Account:", account.String())
-	// Allocate memory for BaseAccount in C.
-	cAccount := (*C.BaseAccount)(C.malloc(C.sizeof_BaseAccount))
-	if cAccount == nil {
-		// Handle allocation failure if needed
-		return nil
-	}
+	// Log retrieved account information for confirmation.
+	logrus.WithFields(logrus.Fields{
+		"address":       addrStr,
+		"accountNumber": account.GetAccountNumber(),
+		"sequence":      account.GetSequence(),
+	}).Info("Account information retrieved successfully")
 
-	// Allocate memory for Coins in C.
-	cAccount.Coins = (*C.Coins)(C.malloc(C.sizeof_Coins))
-	if cAccount.Coins == nil {
-		// Handle allocation failure if needed
-		// C.free(unsafe.Pointer(cAccount))
-		return nil
-	}
-	// get account coin
-
-	accountCoins, err := GetAccountCoins(addr.String())
+	// Allocate memory for the BaseAccount structure in C.
+	cAccount, err := allocateBaseAccount()
 	if err != nil {
-		logrus.Error("Can't get account coins")
-		return nil
-	}
-	cAccount.Coins.Length = C.size_t(len(accountCoins))
-	cAccount.Coins.Array = (*C.Coin)(C.malloc(C.sizeof_Coin * cAccount.Coins.Length))
-	if cAccount.Coins.Array == nil {
-		// Handle allocation failure if needed
-		// C.free(unsafe.Pointer(cAccount.Coins))
-		// C.free(unsafe.Pointer(cAccount))
+		logrus.WithError(err).Error("Failed to allocate memory for BaseAccount")
 		return nil
 	}
 
-	cCoinPtr := cAccount.Coins.Array
-	for _, coin := range accountCoins {
-		// Allocate and set the C string equivalents
-		cCoinPtr.Denom = C.CString(coin.Denom)
-		cCoinPtr.Amount = C.uint64_t(coin.Amount.Int64())
-		// Move the pointer to the next array element; this is equivalent to incrementing an array index
-		cCoinPtr = (*C.Coin)(unsafe.Pointer(uintptr(unsafe.Pointer(cCoinPtr)) + C.sizeof_Coin))
-	}
-
-	// Copy the account address bytes to the C struct.
-	addressBytes := account.GetAddress().Bytes()
-	if len(addressBytes) > len(cAccount.Address) {
-		// Handle error: the address is too big for the allocated array.
-		// Remember to free all previously allocated memory.
-		// C.free(unsafe.Pointer(cAccount.Coins.Array))
-		// C.free(unsafe.Pointer(cAccount.Coins))
-		// C.free(unsafe.Pointer(cAccount))
+	// Fetch and set account coins information.
+	if err := setAccountCoins(cAccount, addrStr); err != nil {
+		logrus.WithError(err).Error("Failed to set account coins")
+		freeBaseAccount(cAccount) // Ensure all allocated memory is freed on error
 		return nil
 	}
-	for i, b := range addressBytes {
-		cAccount.Address[i] = C.uint8_t(b)
-	}
 
-	// Copy the public key bytes to the C struct if a public key is present.
-	if account.GetPubKey() != nil {
-		pubKeyBytes := account.GetPubKey().Bytes()
-		if len(pubKeyBytes) > len(cAccount.PubKey) {
-			// Handle error: the public key is too big for the allocated array.
-			// Remember to free all previously allocated memory.
-			// C.free(unsafe.Pointer(cAccount.Coins.Array))
-			// C.free(unsafe.Pointer(cAccount.Coins))
-			// C.free(unsafe.Pointer(cAccount))
-			return nil
-		}
-		for i, b := range pubKeyBytes {
-			cAccount.PubKey[i] = C.uint8_t(b)
-		}
+	// Copy essential account details to the C structure.
+	if err := copyAccountDetails(cAccount, account); err != nil {
+		logrus.WithError(err).Error("Failed to copy account details to C structure")
+		freeBaseAccount(cAccount) // Ensure all allocated memory is freed on error
+		return nil
 	}
-
-	cAccount.AccountNumber = C.uint64_t(account.GetAccountNumber())
-	cAccount.Sequence = C.uint64_t(account.GetSequence())
 
 	return cAccount
 }
 
+// Helper functions used within QueryAccount for specific tasks.
+func allocateBaseAccount() (*C.BaseAccount, error) {
+	cAccount := (*C.BaseAccount)(C.malloc(C.sizeof_BaseAccount))
+	if cAccount == nil {
+		return nil, errors.New("memory allocation failed for BaseAccount")
+	}
+	return cAccount, nil
+}
+
+func setAccountCoins(cAccount *C.BaseAccount, address string) error {
+	accountCoins, err := GetAccountCoins(address)
+	if err != nil {
+		return err
+	}
+
+	cAccount.Coins = (*C.Coins)(C.malloc(C.sizeof_Coins))
+	if cAccount.Coins == nil {
+		return errors.New("memory allocation failed for Coins")
+	}
+
+	cAccount.Coins.Length = C.size_t(len(accountCoins))
+	cAccount.Coins.Array = (*C.Coin)(C.malloc(C.sizeof_Coin * cAccount.Coins.Length))
+	if cAccount.Coins.Array == nil {
+		return errors.New("memory allocation failed for Coin array")
+	}
+
+	// Populate coin details in the allocated C array.
+	populateCoins(cAccount.Coins.Array, accountCoins)
+	return nil
+}
+
+func populateCoins(cCoinPtr *C.Coin, coins sdk.Coins) {
+	for _, coin := range coins {
+		cCoinPtr.Denom = C.CString(coin.Denom)
+		cCoinPtr.Amount = C.uint64_t(coin.Amount.Int64())
+		cCoinPtr = (*C.Coin)(unsafe.Pointer(uintptr(unsafe.Pointer(cCoinPtr)) + C.sizeof_Coin))
+	}
+}
+
+func copyAccountDetails(cAccount *C.BaseAccount, account authtypes.AccountI) error {
+	copyBytes(cAccount.Address[:], account.GetAddress().Bytes())
+	if account.GetPubKey() != nil {
+		copyBytes(cAccount.PubKey[:], account.GetPubKey().Bytes())
+	}
+	cAccount.AccountNumber = C.uint64_t(account.GetAccountNumber())
+	cAccount.Sequence = C.uint64_t(account.GetSequence())
+	return nil
+}
+
+func copyBytes(dest []C.uint8_t, src []byte) {
+	for i, b := range src {
+		dest[i] = C.uint8_t(b)
+	}
+}
+
+func freeBaseAccount(cAccount *C.BaseAccount) {
+	// Implement the logic to free all allocated memory associated with a BaseAccount.
+}
+
+// NewNibiruClientDefault initializes a new Nibiru client using default network settings.
+// It returns Success if the client is successfully initialized, otherwise Fail.
+//
 //export NewNibiruClientDefault
 func NewNibiruClientDefault() C.int {
-	logrus.Println("Call [NewNibiruClientDefault]") // Use logrus instead of fmt.Println
-	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, false, 2)
+	// Log the function call to trace execution.
+	logrus.Info("Initializing Nibiru client with default settings")
+
+	// Establish a gRPC connection using the default network information.
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
 	if err != nil {
-		logrus.Println("[NewNibiruClientDefault] GetGRPCConnection error: " + err.Error())
+		logrus.WithFields(logrus.Fields{
+			"endpoint": networkInfo.GrpcEndpoint,
+			"error":    err,
+		}).Error("Failed to establish gRPC connection")
 		return Fail
 	}
 
-	gosdk, err := gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
+	// Initialize the Nibiru client with the obtained gRPC connection.
+	gosdk, err = gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
 	if err != nil {
-		logrus.Println("[NewNibiruClientDefault] Connect to network error: " + err.Error())
+		logrus.WithFields(logrus.Fields{
+			"chainID":     networkInfo.ChainID,
+			"rpcEndpoint": networkInfo.TmRpcEndpoint,
+			"error":       err,
+		}).Error("Failed to initialize Nibiru client")
 		return Fail
 	}
-	logrus.Println("[NewNibiruClientDefault] Connected to " + gosdk.ChainId)
+
+	// Log successful connection.
+	logrus.WithFields(logrus.Fields{
+		"chainID": networkInfo.ChainID,
+	}).Info("Successfully connected to the Nibiru network")
+
 	return Success
 }
 
+// NewNibiruClient initializes a new Nibiru client based on the provided chain ID, gRPC, and RPC endpoints.
+// It returns Success if the client initialization is successful, otherwise Fail.
+//
 //export NewNibiruClient
 func NewNibiruClient(chainId *C.char, grpcEndpoint *C.char, rpcEndpoint *C.char) C.int {
-	logrus.Println("Call [NewNibiruClient]")
-	grpcConn, err := gonibi.GetGRPCConnection(C.GoString(grpcEndpoint), true, 2)
+	// Convert C strings to Go strings for better handling in Go functions.
+	chainIDStr := C.GoString(chainId)
+	grpcEndpointStr := C.GoString(grpcEndpoint)
+	rpcEndpointStr := C.GoString(rpcEndpoint)
+
+	// Log the initiation of a new Nibiru client with specific network settings.
+	logrus.WithFields(logrus.Fields{
+		"chainID":      chainIDStr,
+		"grpcEndpoint": grpcEndpointStr,
+		"rpcEndpoint":  rpcEndpointStr,
+	}).Info("Attempting to initialize new Nibiru client")
+
+	// Establish a gRPC connection using the specified endpoint.
+	grpcConn, err := gonibi.GetGRPCConnection(grpcEndpointStr, true, 2)
 	if err != nil {
-		logrus.Println("[NewNibiruClient] GetGRPCConnection error: " + err.Error())
+		logrus.WithFields(logrus.Fields{
+			"grpcEndpoint": grpcEndpointStr,
+			"error":        err,
+		}).Error("Failed to establish gRPC connection")
 		return Fail
 	}
 
-	gosdk, err := gonibi.NewNibiruClient(C.GoString(chainId), grpcConn, C.GoString(rpcEndpoint))
+	// Initialize the Nibiru client with the obtained gRPC connection.
+	_, err = gonibi.NewNibiruClient(chainIDStr, grpcConn, rpcEndpointStr)
 	if err != nil {
-		logrus.Println("[NewNibiruClient] Connect to network error: " + err.Error())
+		logrus.WithFields(logrus.Fields{
+			"chainID":     chainIDStr,
+			"rpcEndpoint": rpcEndpointStr,
+			"error":       err,
+		}).Error("Failed to connect to Nibiru network")
 		return Fail
 	}
 
-	logrus.Println("[NewNibiruClient] Connected to " + gosdk.ChainId)
+	// Log successful connection.
+	logrus.WithFields(logrus.Fields{
+		"chainID": chainIDStr,
+	}).Info("Successfully connected to the Nibiru network")
+
 	return Success
 }
 
+// GenerateRecoveryPhrase creates a new BIP39 mnemonic recovery phrase.
+// It returns a pointer to a C string containing the mnemonic, or an empty string on failure.
+//
 //export GenerateRecoveryPhrase
 func GenerateRecoveryPhrase() *C.char {
-	logrus.Info("Call GenerateRecoveryPhrase")
+	// Log the start of the recovery phrase generation process.
+	logrus.Info("Starting to generate a recovery phrase")
+
+	// Define the entropy size for generating the mnemonic.
 	const mnemonicEntropySize = 256
+
+	// Generate entropy for the mnemonic.
 	entropySeed, err := bip39.NewEntropy(mnemonicEntropySize)
 	if err != nil {
-		logrus.Error("Can't generate recovery phrase")
+		logrus.WithError(err).Error("Failed to generate entropy for recovery phrase")
 		return C.CString("")
 	}
-	phrase, err := bip39.NewMnemonic(entropySeed[:])
+
+	// Create a mnemonic from the generated entropy.
+	phrase, err := bip39.NewMnemonic(entropySeed)
 	if err != nil {
-		logrus.Error("Can't generate recovery phrase")
+		logrus.WithError(err).Error("Failed to create mnemonic from entropy")
 		return C.CString("")
 	}
-	logrus.Info("Return recovery phrase: ", phrase)
-	return C.CString(phrase)
+
+	// Log the successful generation of the recovery phrase.
+	logrus.WithField("phrase", phrase).Info("Recovery phrase generated successfully")
+
+	// Allocate memory for the phrase in C and return the pointer.
+	cPhrase := C.CString(phrase)
+	return cPhrase
 }
 
 // ToCKeyInfo converts KeyInfo to its C representation.
-// todo: currently it's wrong
 func convertKeyInfo(key *keyring.Record) *C.KeyInfo {
 	// Allocate memory for KeyInfo in C.
 	cKeyInfo := (*C.KeyInfo)(C.malloc(C.sizeof_KeyInfo))
@@ -467,45 +677,79 @@ func convertKeyInfo(key *keyring.Record) *C.KeyInfo {
 	return cKeyInfo
 }
 
+// CreateAccount creates a new blockchain account using the provided mnemonic, key name, and passphrase.
+// It returns Success if the account creation is successful, otherwise Fail.
+//
 //export CreateAccount
-func CreateAccount(keyName *C.char, mnemonic *C.char, passphase *C.char) C.int {
-	PrintPayload("CreateAccount", C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase))
-	// algo := hd.Secp256k1
-	// // Create a keyring
-	// record, err := gosdk.Keyring.NewAccount(C.GoString(keyName), C.GoString(mnemonic), C.GoString(passphase), sdk.GetConfig().GetFullBIP44Path(), algo)
-	// if err != nil {
-	// 	logrus.Debug("Failed to create new account", err)
-	// 	return Fail
-	// }
-	record, _, err := gonibi.CreateSigner(C.GoString(mnemonic), gosdk.Keyring, C.GoString(keyName))
+func CreateAccount(keyName *C.char, mnemonic *C.char, passphrase *C.char) C.int {
+	keyNameStr := C.GoString(keyName)
+	mnemonicStr := C.GoString(mnemonic)
+	// passphraseStr := C.GoString(passphrase)
+
+	// Log the attempt to create a new account with the specified key name.
+	logrus.WithField("keyName", keyNameStr).Info("Attempting to create new account")
+
+	// Create a new signer using the provided mnemonic and key name.
+	record, _, err := gonibi.CreateSigner(mnemonicStr, gosdk.Keyring, keyNameStr)
 	if err != nil {
-		logrus.Debug("Failed to create new account", err)
+		logrus.WithFields(logrus.Fields{
+			"keyName": keyNameStr,
+			"error":   err,
+		}).Error("Failed to create new account")
 		return Fail
 	}
 
-	// Add signer to keyring
-	// if err := gonibi.AddSignerToKeyring(gosdk.Keyring, privateKey, privateKey.PubKey().String()); err != nil {
-	// 	logrus.Error("Can't assing singer to keyring: ", err)
-	// 	return Fail
-	// }
+	// Obtain the address of the newly created account.
+	addr, err := record.GetAddress()
+	if err != nil {
+		logrus.WithError(err).Error("Failed to get address of the newly created account")
+		return Fail
+	}
 
-	addr, _ := record.GetAddress()
-	logrus.Printf("Account created with address: %s", addr.String())
+	// Log the successful account creation.
+	logrus.WithFields(logrus.Fields{
+		"keyName": keyNameStr,
+		"address": addr.String(),
+	}).Info("Account created successfully")
 
+	// Optionally print the list of all signers for debugging.
 	PrintListSigners()
+
 	return Success
 }
 
+// GetPrivKeyFromMnemonic retrieves a private key from a given mnemonic and key name,
+// returning a pointer to the private key data in a C-compatible format.
+//
 //export GetPrivKeyFromMnemonic
-func GetPrivKeyFromMnemonic(mnemoic *C.char, keyName *C.char) *C.uint8_t {
-	PrintPayload("GetPrivKeyFromMnemonic", C.GoString(mnemoic), C.GoString(keyName))
+func GetPrivKeyFromMnemonic(mnemonic *C.char, keyName *C.char) *C.uint8_t {
+	mnemonicStr := C.GoString(mnemonic)
+	keyNameStr := C.GoString(keyName)
+
+	// Log the attempt to retrieve a private key using the mnemonic and key name.
+	logrus.WithField("keyName", keyNameStr).Info("Attempting to retrieve private key from mnemonic")
+
+	// Initialize the keyring.
 	kring := gosdk.Keyring
-	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, C.GoString(mnemoic), C.GoString(keyName))
+
+	// Retrieve the private key from the mnemonic.
+	privKey, _, err := gonibi.PrivKeyFromMnemonic(kring, mnemonicStr, keyNameStr)
 	if err != nil {
-		logrus.Debug("Failed to get priv key", err)
+		logrus.WithFields(logrus.Fields{
+			"keyName": keyNameStr,
+			"error":   err,
+		}).Error("Failed to retrieve private key from mnemonic")
 		return nil
 	}
-	logrus.Info("Address String", privKey.PubKey().Address().String())
+
+	// Log the successful retrieval of the private key.
+	addressStr := privKey.PubKey().Address().String()
+	logrus.WithFields(logrus.Fields{
+		"keyName": keyNameStr,
+		"address": addressStr,
+	}).Info("Private key retrieved successfully")
+
+	// Convert the private key bytes to a C-compatible format.
 	return revertToCData(privKey.Bytes())
 }
 
@@ -791,6 +1035,7 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 
 //export ExecuteWasmContract
 func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.char, amount C.int) *C.char {
+	logrus.Info("Call ExecuteWasmContract ")
 	// Convert C types to Go types
 	fromStr := C.GoString(senderAddress)
 	contractStr := C.GoString(contractAddress)
@@ -838,6 +1083,7 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.ch
 
 //export QueryWasmContract
 func QueryWasmContract(contractAddress, queryMsg *C.char) *C.char {
+	logrus.Info("Call QueryWasmContract ")
 	// Convert C types to Go types
 	contractStr := C.GoString(contractAddress)
 	msgStr := C.GoString(queryMsg)
@@ -867,22 +1113,44 @@ func QueryWasmContract(contractAddress, queryMsg *C.char) *C.char {
 	return C.CString(responseMsg.String())
 }
 
+// QueryTXHash retrieves the transaction details corresponding to a given transaction hash.
+// It returns a pointer to a C string containing the transaction log, or nil on failure.
+//
 //export QueryTXHash
 func QueryTXHash(txHash *C.char) *C.char {
-	decodedBytes, err := hex.DecodeString(C.GoString(txHash))
+	// Convert C string to Go string.
+	txHashStr := C.GoString(txHash)
 
+	// Log the attempt to decode and query transaction hash.
+	logrus.WithField("txHash", txHashStr).Info("Attempting to query transaction")
+
+	// Decode hex string to bytes.
+	decodedBytes, err := hex.DecodeString(txHashStr)
 	if err != nil {
-		logrus.Error("Error getTX info: ", err)
+		logrus.WithFields(logrus.Fields{
+			"txHash": txHashStr,
+			"error":  err,
+		}).Error("Failed to decode transaction hash")
 		return nil
 	}
 
+	// Query transaction details using the decoded bytes.
 	resultTx, err := gosdk.CometRPC.Tx(context.Background(), decodedBytes, true)
-
 	if err != nil {
-		logrus.Error("Error getTX info: ", err)
+		logrus.WithFields(logrus.Fields{
+			"txHash": txHashStr,
+			"error":  err,
+		}).Error("Failed to retrieve transaction details")
 		return nil
 	}
 
-	logrus.Info("Result: ", resultTx.TxResult.Log)
-	return C.CString(resultTx.TxResult.Log)
+	// Log the successful retrieval of transaction details.
+	logrus.WithFields(logrus.Fields{
+		"txHash": txHashStr,
+		"result": resultTx.TxResult.Log,
+	}).Info("Transaction retrieved successfully")
+
+	// Convert the transaction log into a C string to return.
+	cLog := C.CString(resultTx.TxResult.Log)
+	return cLog
 }

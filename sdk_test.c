@@ -18,7 +18,7 @@ int main()
     char *keyName = "TestKey";
     // Create new wallet
     // Generate Menomonic
-    char *prases = "napkin rigid magnet grass plastic spawn replace hobby tray eternal pupil olive pledge nasty animal base bitter climb guess analyst fat neglect zoo earn";
+    char *testMnemonic = "napkin rigid magnet grass plastic spawn replace hobby tray eternal pupil olive pledge nasty animal base bitter climb guess analyst fat neglect zoo earn";
     char *adminPhases = "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host";
 
     // Create key(private,public =>signner) from menemonic
@@ -29,7 +29,7 @@ int main()
         printf("Failed to create account\n");
         return 1;
     }
-    int createAccount = CreateAccount(keyName, prases, passPrares);
+    int createAccount = CreateAccount(keyName, testMnemonic, passPrares);
     if (createAccount != 0)
     {
         printf("Failed to create account\n");
@@ -54,8 +54,8 @@ int main()
     }
 
     sleep(3);
-    char* testTx2 = ExecuteWasmContract(adminAddress, "nibi1nc5tatafv6eyq7llkr2gv50ff9e22mnf70qgjlv737ktmt4eswrqugq26k",
-    "{\"mint\": {\"token_id\": \"unique-nft-12\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}", 
+    char* testTx2 = ExecuteWasmContract(adminAddress, "nibi1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3slkhcux",
+    "{\"mint\": {\"token_id\": \"unique-nft-2\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}", 
     "unibi", 1);
     if (testTx2 == NULL)
     {
@@ -77,8 +77,8 @@ int main()
     }
 
     sleep(3);
-    char* testTx4 = QueryWasmContract("nibi1nc5tatafv6eyq7llkr2gv50ff9e22mnf70qgjlv737ktmt4eswrqugq26k",
-    "{\"owner_of\": {\"token_id\": \"unique-nft-12\", \"include_expired\": false}}");
+    char* testTx4 = QueryWasmContract("nibi1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3slkhcux",
+    "{\"owner_of\": {\"token_id\": \"unique-nft-2\", \"include_expired\": false}}");
     if (testTx4 == NULL)
     {
         printf("Failed to Test QueryWasmContract\n");
