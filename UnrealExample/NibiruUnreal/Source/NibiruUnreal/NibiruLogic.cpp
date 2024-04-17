@@ -9,11 +9,6 @@
 
 void UNibiruLogic::OnInitApp()
 {
-    int ret = NewNibiruClientDefault();
-    if (ret != 0)
-    {
-        printf("Failed to create NibiruClient\n");
-    }
 }
 
 void UNibiruLogic::OnCreateWalletClicked(FString &address_key_return, FString &admin_address_key_return, bool &IsCreateOk, FString &error_return)
@@ -22,7 +17,13 @@ void UNibiruLogic::OnCreateWalletClicked(FString &address_key_return, FString &a
     error_return = "";
     admin_address_key_return = "";
     address_key_return = "";
-
+    int ret = NewNibiruClientDefault();
+    if (ret != 0)
+    {
+        error_return = "Failed to create NibiruClient";
+        printf("Failed to create NibiruClient\n");
+        return;
+    }
     char *keyNameAdmin = strdup("AdminKey");
     char *keyName = strdup("TestKey");
     // Create new wallet
