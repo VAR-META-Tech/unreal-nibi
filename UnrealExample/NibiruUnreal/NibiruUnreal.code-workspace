@@ -11,82 +11,7 @@
 	],
 	"settings": {
 		"typescript.tsc.autoDetect": "off",
-		"npm.autoDetect": "off",
-		"files.associations": {
-			"__bit_reference": "cpp",
-			"__config": "cpp",
-			"__hash_table": "cpp",
-			"__locale": "cpp",
-			"__node_handle": "cpp",
-			"__split_buffer": "cpp",
-			"__threading_support": "cpp",
-			"__tree": "cpp",
-			"__verbose_abort": "cpp",
-			"any": "cpp",
-			"array": "cpp",
-			"bitset": "cpp",
-			"cctype": "cpp",
-			"cfenv": "cpp",
-			"charconv": "cpp",
-			"cinttypes": "cpp",
-			"clocale": "cpp",
-			"cmath": "cpp",
-			"codecvt": "cpp",
-			"complex": "cpp",
-			"condition_variable": "cpp",
-			"csignal": "cpp",
-			"cstdarg": "cpp",
-			"cstddef": "cpp",
-			"cstdint": "cpp",
-			"cstdio": "cpp",
-			"cstdlib": "cpp",
-			"cstring": "cpp",
-			"ctime": "cpp",
-			"cwchar": "cpp",
-			"cwctype": "cpp",
-			"deque": "cpp",
-			"execution": "cpp",
-			"forward_list": "cpp",
-			"fstream": "cpp",
-			"future": "cpp",
-			"initializer_list": "cpp",
-			"iomanip": "cpp",
-			"ios": "cpp",
-			"iosfwd": "cpp",
-			"iostream": "cpp",
-			"istream": "cpp",
-			"limits": "cpp",
-			"list": "cpp",
-			"locale": "cpp",
-			"map": "cpp",
-			"mutex": "cpp",
-			"new": "cpp",
-			"optional": "cpp",
-			"ostream": "cpp",
-			"queue": "cpp",
-			"ratio": "cpp",
-			"regex": "cpp",
-			"scoped_allocator": "cpp",
-			"set": "cpp",
-			"shared_mutex": "cpp",
-			"span": "cpp",
-			"sstream": "cpp",
-			"stack": "cpp",
-			"stdexcept": "cpp",
-			"streambuf": "cpp",
-			"string": "cpp",
-			"string_view": "cpp",
-			"strstream": "cpp",
-			"tuple": "cpp",
-			"typeinfo": "cpp",
-			"unordered_map": "cpp",
-			"unordered_set": "cpp",
-			"valarray": "cpp",
-			"variant": "cpp",
-			"vector": "cpp",
-			"algorithm": "cpp",
-			"*.ipp": "cpp"
-		}
+		"npm.autoDetect": "off"
 	},
 	"extensions": {
 		"recommendations": [
@@ -108,7 +33,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -125,7 +50,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -145,7 +70,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -163,7 +88,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -180,7 +105,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -200,7 +125,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -218,7 +143,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -235,7 +160,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -255,7 +180,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -273,7 +198,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -290,7 +215,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -310,7 +235,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -328,7 +253,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -345,7 +270,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -365,7 +290,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -383,7 +308,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -400,7 +325,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -420,7 +345,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -438,7 +363,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -455,7 +380,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -475,7 +400,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -493,7 +418,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -510,7 +435,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -530,7 +455,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -548,7 +473,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -565,7 +490,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -585,7 +510,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -603,7 +528,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -620,7 +545,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -640,7 +565,7 @@
 					"NibiruUnreal",
 					"IOS",
 					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -658,7 +583,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -675,7 +600,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -695,7 +620,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -713,7 +638,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -730,7 +655,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -750,7 +675,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -768,7 +693,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -785,7 +710,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -805,7 +730,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
@@ -823,7 +748,7 @@
 			{
 				"name": "Launch NibiruUnreal (Debug)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Debug.app/Contents/MacOS/UnrealGame-Mac-Debug",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Debug.app/Contents/MacOS/UnrealGame-Mac-Debug",
 				"preLaunchTask": "NibiruUnreal Mac Debug Build",
 				"args": [
 				],
@@ -833,7 +758,7 @@
 			{
 				"name": "Launch NibiruUnreal (DebugGame)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-DebugGame.app/Contents/MacOS/UnrealGame-Mac-DebugGame",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-DebugGame.app/Contents/MacOS/UnrealGame-Mac-DebugGame",
 				"preLaunchTask": "NibiruUnreal Mac DebugGame Build",
 				"args": [
 				],
@@ -843,7 +768,7 @@
 			{
 				"name": "Launch NibiruUnreal (Development)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame.app/Contents/MacOS/UnrealGame",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame.app/Contents/MacOS/UnrealGame",
 				"preLaunchTask": "NibiruUnreal Mac Development Build",
 				"args": [
 				],
@@ -853,7 +778,7 @@
 			{
 				"name": "Launch NibiruUnreal (Test)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Test.app/Contents/MacOS/UnrealGame-Mac-Test",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Test.app/Contents/MacOS/UnrealGame-Mac-Test",
 				"preLaunchTask": "NibiruUnreal Mac Test Build",
 				"args": [
 				],
@@ -863,7 +788,7 @@
 			{
 				"name": "Launch NibiruUnreal (Shipping)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Shipping.app/Contents/MacOS/UnrealGame-Mac-Shipping",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Shipping.app/Contents/MacOS/UnrealGame-Mac-Shipping",
 				"preLaunchTask": "NibiruUnreal Mac Shipping Build",
 				"args": [
 				],
@@ -876,7 +801,7 @@
 				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Binaries/Mac/UnrealEditor-Mac-Debug.app/Contents/MacOS/UnrealEditor-Mac-Debug",
 				"preLaunchTask": "NibiruUnrealEditor Mac Debug Build",
 				"args": [
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
 				],
 				"cwd": "/Users/Shared/Epic Games/UE_5.3",
 				"type": "lldb"
@@ -887,7 +812,7 @@
 				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Binaries/Mac/UnrealEditor-Mac-DebugGame.app/Contents/MacOS/UnrealEditor-Mac-DebugGame",
 				"preLaunchTask": "NibiruUnrealEditor Mac DebugGame Build",
 				"args": [
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
 				],
 				"cwd": "/Users/Shared/Epic Games/UE_5.3",
 				"type": "lldb"
@@ -898,7 +823,7 @@
 				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Binaries/Mac/UnrealEditor.app/Contents/MacOS/UnrealEditor",
 				"preLaunchTask": "NibiruUnrealEditor Mac Development Build",
 				"args": [
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
 				],
 				"cwd": "/Users/Shared/Epic Games/UE_5.3",
 				"type": "lldb"
@@ -912,7 +837,7 @@
 				"args": [
 					"-projectfiles",
 					"-vscode",
-					"-project=/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-project=/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-game",
 					"-engine",
 					"-dotnet"
