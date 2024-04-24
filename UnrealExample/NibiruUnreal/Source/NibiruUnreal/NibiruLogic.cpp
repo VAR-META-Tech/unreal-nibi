@@ -21,6 +21,7 @@ void UNibiruLogic::OnInitApp(bool &IsCreateOk, FString &error_return)
         return;
     }
     IsCreateOk = true;
+    error_return = "Successfully created NibiruClient.";
 }
 
 void UNibiruLogic::OnCreateWalletClicked(FString &address_key_return, bool &IsCreateOk, FString &error_return)
@@ -42,12 +43,13 @@ void UNibiruLogic::OnCreateWalletClicked(FString &address_key_return, bool &IsCr
         printf("Failed to create account\n");
         return;
     }
-    IsCreateOk = true;
-
     // Get account address
     char *address = GetAddressFromKeyName(keyName);
     printf("Account Address: %s\n", address);
     address_key_return = address;
+
+    IsCreateOk = true;
+    error_return =  "Wallet created successfully";
 }
 
  void UNibiruLogic::GetAccountBalance(FString address, FString &balance_return, bool &IsSuccess, FString &error_return){
@@ -55,13 +57,14 @@ void UNibiruLogic::OnCreateWalletClicked(FString &address_key_return, bool &IsCr
     auto convertedStr = StringCast<ANSICHAR>(*address);
     const char* queryAddress = convertedStr.Get();
     BaseAccount *account = QueryAccount((char*)queryAddress);
+    error_return="";
     balance_return="";
     //balance_return = "Balances :";
     if (account == NULL){
         error_return = "Failed to GetAccountBalance";
         return;
     }
-    balance_return += std::to_string(account->Coins->Array[0].Amount).c_str();
+    balance_return = std::to_string(account->Coins->Array[0].Amount).c_str();
     // for (int i=0; i < account->Coins->Length; i++){
     //     balance_return += account->Coins->Array[0].Denom;
     //     balance_return += " - ";
@@ -69,6 +72,7 @@ void UNibiruLogic::OnCreateWalletClicked(FString &address_key_return, bool &IsCr
     //     balance_return += ";";
     // }
     IsSuccess = true;
+    error_return="Successfully retrieved Account Balance";
  }
 
 void UNibiruLogic::OnFaucetClicked(FString address_received, bool &IsSuccess, FString &error_return){
@@ -91,7 +95,6 @@ void UNibiruLogic::OnFaucetClicked(FString address_received, bool &IsSuccess, FS
     const char* toAddress = convertedStr.Get();
     char *demon = strdup("unibi");
     int tx = TransferToken(adminAddress, (char*)toAddress, demon, 250);
-    delete[] toAddress;
     if (tx != 0)
     {
         error_return = "Failed to transfer";
@@ -99,6 +102,7 @@ void UNibiruLogic::OnFaucetClicked(FString address_received, bool &IsSuccess, FS
         return;
     }
     IsSuccess = true;
+    error_return="Faucet Successfully!";
 }
 
 
@@ -106,21 +110,22 @@ void UNibiruLogic::OnTransferClicked(FString from_address, FString to_address, F
     IsSuccess = false;
     error_return = "";
     auto convertedStr = StringCast<ANSICHAR>(*from_address);
-    const char* fromAddress = convertedStr.Get();
+    const char* fromAddress_ = convertedStr.Get();
     auto convertedStr2 = StringCast<ANSICHAR>(*to_address);
-    const char* toAddress = convertedStr2.Get();
+    const char* toAddress_ = convertedStr2.Get();
     auto convertedStr3 = StringCast<ANSICHAR>(*demon);
-    const char* demonStr = convertedStr3.Get();
+    const char* demonStr_ = convertedStr3.Get();
     
-    int tx = TransferToken((char*)fromAddress, (char*)toAddress, (char*)demonStr, amount);
-    delete[] fromAddress;
-    delete[] toAddress;
-    delete[] demonStr;
+    int tx = TransferToken((char*)fromAddress_, (char*)toAddress_, (char*)demonStr_, amount);
+
+   
     if (tx != 0)
     {
         error_return = "Failed to transfer";
         printf("Failed to transfer\n");
         return;
     }
+   
     IsSuccess = true;
+    error_return = "Transfer Successfully ";
 }
