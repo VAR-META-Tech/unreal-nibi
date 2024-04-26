@@ -63,6 +63,8 @@ Follow these steps to set up the project environment:
    ```sh
     install_name_tool -id @rpath/unreal_nibi_sdk.dylib unreal_nibi_sdk.dylib
    ```
+
+https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/2ceed8bf-ab29-4a10-92c0-d71f2e9a021c
    
 ### macOS Specific Instructions
 
@@ -70,7 +72,15 @@ Follow these steps to set up the project environment:
 A examples unreal project can be found in the following directory:  
 `UnrealExample/`.
 
-For Unreal project please reference example in ```NibiruUnreal```, you need define Build.cs to integration Aptos library with Unreal engine.
+
+
+https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/c9c6f4df-0181-4a28-bb50-2c6ddaad1afd
+
+
+
+
+
+For Unreal project please reference example in ```NibiruUnreal```, you need define Build.cs to integration `unreal_nibi_sdk` library with Unreal engine.
 Here is an example:
 ```cshape
 using UnrealBuildTool;
