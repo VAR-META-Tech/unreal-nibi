@@ -9,6 +9,11 @@
 #include <string>
 #include "unreal_nibi_sdk.h"
 
+void UNibiruLogic::CopyCurrentWalletAdress(FString text)
+{
+    FPlatformMisc::ClipboardCopy(*text);
+}
+
 void UNibiruLogic::OnInitApp(bool &IsCreateOk, FString &error_return)
 {
     //localnet
