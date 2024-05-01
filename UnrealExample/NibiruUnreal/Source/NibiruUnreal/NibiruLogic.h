@@ -15,7 +15,7 @@ class NIBIRUUNREAL_API UNibiruLogic : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "CopyCurrentWalletAdress"), Category = "NibiruLogic")
-	static void CopyCurrentWalletAdress(FString text);
+	static void CopyCurrentWalletAdress(FString StringToCopy);
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "OnInitApp"), Category = "NibiruLogic")
 	static void OnInitApp(bool &IsCreateOk, FString &error_return);
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "OnCreateWalletClicked"), Category = "UIController")

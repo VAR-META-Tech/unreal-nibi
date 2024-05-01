@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NibiruLogic.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -9,9 +8,9 @@
 #include <string>
 #include "unreal_nibi_sdk.h"
 
-void UNibiruLogic::CopyCurrentWalletAdress(FString text)
+void UNibiruLogic::CopyCurrentWalletAdress(FString StringToCopy)
 {
-    FPlatformMisc::ClipboardCopy(*text);
+  //  FPlatformMisc::ClipboardCopy(* StringToCopy);
 }
 
 void UNibiruLogic::OnInitApp(bool &IsCreateOk, FString &error_return)
