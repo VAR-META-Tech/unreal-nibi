@@ -15,7 +15,7 @@ void UNibiruLogic::CopyCurrentWalletAdress(FString StringToCopy)
 
 void UNibiruLogic::OnInitApp(bool &IsCreateOk, FString &error_return)
 {
-    //localnet
+    //testnet
     IsCreateOk = false;
     int ret = NewNibiruClientDefault();
     if (ret != 0)
@@ -36,10 +36,10 @@ void UNibiruLogic::OnCreateWalletClicked(FString &address_key_return, bool &IsCr
     char *keyName = strdup("TestKey");
     // Create new wallet
     // Generate Menomonic
-    char *mnemonic = strdup("napkin rigid magnet grass plastic spawn replace hobby tray eternal pupil olive pledge nasty animal base bitter climb guess analyst fat neglect zoo earn");
+    char *mnemonic = strdup("toe cream coach quiz cactus nest spike gauge opinion legal father stadium lizard match wood immune odor depart sauce timber crash pig thought seat");
     
     // Create key(private,public =>signner) from menemonic
-    char *passPhase = strdup("pass");
+    char *passPhase = strdup("");
     int createAccount = CreateAccount(keyName, mnemonic, passPhase);
     if (createAccount != 0)
     {
@@ -83,7 +83,7 @@ void UNibiruLogic::OnFaucetClicked(FString address_received, bool &IsSuccess, FS
     error_return ="";
     IsSuccess = false;
     char *adminMnemonic = strdup("guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host");
-    char *passPhase = strdup("pass");
+    char *passPhase = strdup("");
     char *keyNameAdmin = strdup("AdminKey");
     int createAdminAccount = CreateAccount(keyNameAdmin, adminMnemonic, passPhase);
     if (createAdminAccount != 0)
@@ -98,8 +98,8 @@ void UNibiruLogic::OnFaucetClicked(FString address_received, bool &IsSuccess, FS
     auto convertedStr = StringCast<ANSICHAR>(*address_received);
     const char* toAddress = convertedStr.Get();
     char *demon = strdup("unibi");
-    int tx = TransferToken(adminAddress, (char*)toAddress, demon, 250);
-    if (tx != 0)
+    char* tx = TransferToken(adminAddress, (char*)toAddress, demon, 250);
+    if (tx == NULL)
     {
         error_return = "Failed to transfer";
         printf("Failed to transfer\n");
@@ -120,10 +120,10 @@ void UNibiruLogic::OnTransferClicked(FString from_address, FString to_address, F
     auto convertedStr3 = StringCast<ANSICHAR>(*demon);
     const char* demonStr_ = convertedStr3.Get();
     
-    int tx = TransferToken((char*)fromAddress_, (char*)toAddress_, (char*)demonStr_, amount);
+    char* tx = TransferToken((char*)fromAddress_, (char*)toAddress_, (char*)demonStr_, amount);
 
    
-    if (tx != 0)
+    if (tx == NULL)
     {
         error_return = "Failed to transfer";
         printf("Failed to transfer\n");
