@@ -161,7 +161,7 @@ func init() {
 	// Attempt to establish a gRPC connection using the local network configuration.
 	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
 	if err != nil {
-		logrus.WithError(err).Fatalf("Failed to initialize gRPC connection with endpoint %s", networkInfo.GrpcEndpoint)
+		logrus.WithError(err).Error("Failed to initialize gRPC connection with endpoint ", networkInfo.GrpcEndpoint)
 	} else {
 		logrus.WithField("endpoint", networkInfo.GrpcEndpoint).Info("gRPC connection established successfully")
 	}
@@ -169,7 +169,7 @@ func init() {
 	// Initialize the Nibiru client with the obtained gRPC connection.
 	gosdk, err = gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
 	if err != nil {
-		logrus.WithError(err).Fatalf("Failed to initialize Nibiru client for chain ID %s", networkInfo.ChainID)
+		logrus.WithError(err).Error("Failed to initialize Nibiru client for chain ID ", networkInfo.ChainID)
 	} else {
 		logrus.WithFields(logrus.Fields{
 			"chainID":     networkInfo.ChainID,
@@ -564,7 +564,7 @@ func NewNibiruClient(chainId *C.char, grpcEndpoint *C.char, rpcEndpoint *C.char)
 	}).Info("Attempting to initialize new Nibiru client")
 
 	// Establish a gRPC connection using the specified endpoint.
-	grpcConn, err := gonibi.GetGRPCConnection(grpcEndpointStr, true, 2)
+	grpcConn, err := gonibi.GetGRPCConnection(grpcEndpointStr, false, 2)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"grpcEndpoint": grpcEndpointStr,

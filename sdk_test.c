@@ -7,29 +7,31 @@
 int main()
 {
     // Create a new NibiruClient instance using the exported Go function.
-    int ret = NewNibiruClientDefault();
-    if (ret != 0)
-    {
-        printf("Failed to create NibiruClient\n");
-        return 1;
-    }
+    // int ret = NewNibiruClientDefault();
+    // if (ret != 0)
+    // {
+    //     printf("Failed to create NibiruClient\n");
+    //     return 1;
+    // }
+
+    SwitchNetwork("test");
 
     char *keyNameAdmin = "AdminKey";
     char *keyName = "TestKey";
     // Create new wallet
     // Generate Menomonic
-    char *testMnemonic = "napkin rigid magnet grass plastic spawn replace hobby tray eternal pupil olive pledge nasty animal base bitter climb guess analyst fat neglect zoo earn";
-    char *adminPhases = "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host";
+    char *testMnemonic = "toe cream coach quiz cactus nest spike gauge opinion legal father stadium lizard match wood immune odor depart sauce timber crash pig thought seat";
+    char *adminMnemonic = "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host";
 
     // Create key(private,public =>signner) from menemonic
-    char *passPrares = "pass";
-    int createAdminAccount = CreateAccount(keyNameAdmin, adminPhases, "");
+    char *passPhrase = "";
+    int createAdminAccount = CreateAccount(keyNameAdmin, adminMnemonic, "");
     if (createAdminAccount != 0)
     {
         printf("Failed to create account\n");
         return 1;
     }
-    int createAccount = CreateAccount(keyName, testMnemonic, passPrares);
+    int createAccount = CreateAccount(keyName, testMnemonic, passPhrase);
     if (createAccount != 0)
     {
         printf("Failed to create account\n");
@@ -45,7 +47,7 @@ int main()
 
     BaseAccount *baseAccAdmin = QueryAccount(adminAddress);
     BaseAccount *baseAcc = QueryAccount(address);
-    int testTx = TransferToken(adminAddress, address, "unibi", 250);
+    int testTx = TransferToken(adminAddress, address, "unibi", 10000);
     if (testTx != 0)
     {
         printf("Failed to Test transfer\n");
@@ -54,7 +56,7 @@ int main()
 
     sleep(3);
     char *testTx2 = ExecuteWasmContract(adminAddress, "nibi1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3slkhcux",
-                                        "{\"mint\": {\"token_id\": \"unique-nft-14\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}",
+                                        "{\"mint\": {\"token_id\": \"unique-nft-15\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}",
                                         "unibi", 1);
     if (testTx2 == NULL)
     {
@@ -81,7 +83,7 @@ int main()
 
     sleep(3);
     char *testTx4 = QueryWasmContract("nibi1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3slkhcux",
-                                      "{\"owner_of\": {\"token_id\": \"unique-nft-14\", \"include_expired\": false}}");
+                                      "{\"owner_of\": {\"token_id\": \"unique-nft-15\", \"include_expired\": false}}");
     if (testTx4 == NULL)
     {
         printf("Failed to Test QueryWasmContract\n");
