@@ -63,6 +63,12 @@ type NetworkInfo struct {
 	ChainID           string
 }
 
+// Constants to represent the success or failure of functions.
+const (
+	Success = 0 // Success indicates that the function completed its task without errors.
+	Fail    = 1 // Fail indicates that the function encountered an error and did not complete successfully.
+)
+
 var (
 	LocalNetworkInfo = NetworkInfo{
 		GrpcEndpoint:      "localhost:9090",
@@ -101,86 +107,130 @@ var wasmClient wasmtypes.QueryClient
 var networkInfo NetworkInfo
 
 func InitClients() error {
+	// Initialize clients for respective services using the global gosdk instance
 	authClient = authtypes.NewQueryClient(gosdk.Querier.ClientConn)
 	bankClient = banktypes.NewQueryClient(gosdk.Querier.ClientConn)
 	wasmClient = wasmtypes.NewQueryClient(gosdk.Querier.ClientConn)
+
+	// Check if any client initialization failed
 	if authClient == nil || bankClient == nil || wasmClient == nil {
+		logrus.Error("Failed to initialize one or more clients")
 		return errors.New("can't init client")
 	}
+	logrus.Info("Clients initialized successfully")
 	return nil
 }
 
 func PrintPayload(funcName string, args ...interface{}) {
-	// Log the function name
-	logrus.WithField("Name", funcName).Info("\n\nCall function")
+	logrus.WithField("Function", funcName).Info("Function call started")
 
-	// Log the function parameters
+	// Log each argument passed to the function
 	for i, arg := range args {
-		logrus.WithFields(logrus.Fields{"arg": i, "value": fmt.Sprintf("%v", arg)}).Debug("Parameter")
+		logrus.WithFields(logrus.Fields{
+			"argument index": i,
+			"value":          fmt.Sprintf("%v", arg),
+		}).Debug("Function parameter")
 	}
 }
+
 func init() {
+	// Set up the logging format and level.
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
+
+	// Set the initial network information to local settings.
 	networkInfo = LocalNetworkInfo
 
+	// Attempt to establish a gRPC connection using the local network configuration.
 	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
 	if err != nil {
-		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		logrus.WithError(err).Error("Failed to initialize gRPC connection with endpoint ", networkInfo.GrpcEndpoint)
+	} else {
+		logrus.WithField("endpoint", networkInfo.GrpcEndpoint).Info("gRPC connection established successfully")
 	}
 
+	// Initialize the Nibiru client with the obtained gRPC connection.
 	gosdk, err = gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
 	if err != nil {
-		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		logrus.WithError(err).Error("Failed to initialize Nibiru client for chain ID ", networkInfo.ChainID)
+	} else {
+		logrus.WithFields(logrus.Fields{
+			"chainID":     networkInfo.ChainID,
+			"rpcEndpoint": networkInfo.TmRpcEndpoint,
+		}).Info("Nibiru client initialized successfully")
 	}
 
+	// Initialize clients for auth, bank, and wasm modules.
 	if err := InitClients(); err != nil {
-		logrus.Println("[ERR] ", err)
+		logrus.WithError(err).Error("Failed to initialize clients")
+	} else {
+		logrus.Info("All clients initialized successfully")
 	}
-	logrus.Println("[init] Nibiru client initialized")
+
+	// Confirm the package initialization is complete.
+	logrus.Info("Package initialization completed successfully")
 }
 
+// SwitchNetwork changes the network configuration based on the provided network name.
+// It returns Success (0) if the switch is successful, otherwise Fail (1).
+//
 //export SwitchNetwork
 func SwitchNetwork(network string) int {
-	logrus.Info("Call SwitchNetwork")
-	networkStr := network
-	switch networkStr {
+	// Convert C string to Go string
+	logrus.WithField("network", network).Info("Attempting to switch network")
+
+	// Determine the appropriate network settings based on the input
+	var grpcInsecure bool
+	switch network {
 	case "local":
 		networkInfo = LocalNetworkInfo
+		grpcInsecure = true
 	case "dev":
 		networkInfo = DevNetworkInfo
+		grpcInsecure = false
 	case "test":
 		networkInfo = TestNetworkInfo
+		grpcInsecure = false
 	case "main":
 		networkInfo = MainNetworkInfo
+		grpcInsecure = false
 	default:
+		logrus.WithField("network", network).Warn("Unknown network specified, defaulting to test network")
 		networkInfo = TestNetworkInfo
+		grpcInsecure = false
 	}
-	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
+
+	// Establish a new gRPC connection with the updated network settings
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, grpcInsecure, 2)
 	if err != nil {
-		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		logrus.WithFields(logrus.Fields{
+			"endpoint": networkInfo.GrpcEndpoint,
+			"error":    err,
+		}).Error("Failed to initialize gRPC connection")
 		return Fail
 	}
 
+	// Initialize the Nibiru client with the new gRPC connection
 	gosdk, err = gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
 	if err != nil {
-		logrus.Fatalf("Failed to initialize Nibiru client: %s", err)
+		logrus.WithFields(logrus.Fields{
+			"chainID":     networkInfo.ChainID,
+			"rpcEndpoint": networkInfo.TmRpcEndpoint,
+			"error":       err,
+		}).Error("Failed to initialize Nibiru client")
 		return Fail
 	}
 
-	logrus.Info("Switch to network: ", networkStr)
+	logrus.WithField("network", network).Info("Network switched successfully")
 
+	// Reinitialize the clients to ensure they use the new network configuration
 	if err := InitClients(); err != nil {
-		logrus.Error("Init client err: ", err)
+		logrus.WithError(err).Error("Failed to initialize clients after network switch")
 		return Fail
 	}
+
 	return Success
 }
-
-const (
-	Success = 0
-	Fail    = 1
-)
 
 // Niburu method
 
@@ -429,6 +479,11 @@ func ImportAccountFromMnemoic(mnemonic string, keyName string) int {
 func ImportAccountFromPrivateKey(privateKey []byte, keyName string) int {
 	// PrintPayload("ImportAccountFromPrivateKey", keyName)
 	// Create a PrivKey instance and assign the decoded bytes to its Key field
+	if privateKey == nil {
+		logrus.Error("Private key is nil")
+		return Fail
+
+	}
 	privKey := secp256k1.PrivKey{
 		Key: privateKey,
 	}
@@ -575,7 +630,8 @@ func PrintListSigners() {
 
 //export DeleteAccount
 func DeleteAccount(keyName string, password string) int {
-	logrus.Debug("Call DeleteAccount")
+	// Log the attempt to delete an account
+	logrus.Debug("Attempting to delete account with key name")
 
 	err := gosdk.Keyring.Delete(keyName)
 	if err != nil {
@@ -587,7 +643,7 @@ func DeleteAccount(keyName string, password string) int {
 }
 
 //export TransferToken
-func TransferToken(fromAddress, toAddress, denom string, amount int) int {
+func TransferToken(fromAddress, toAddress, denom string, amount int) string {
 	logrus.Info("Call TransferToken")
 	// PrintPayload("TransferToken", fromAddress, toAddress, denom, amount)
 	// Convert C strings to Go strings
@@ -598,26 +654,26 @@ func TransferToken(fromAddress, toAddress, denom string, amount int) int {
 	fromAcc, err := QueryAccount(fromStr)
 	if err != nil || fromAcc == nil {
 		logrus.Error("Can't get fromAccount", err)
-		return Fail
+		return ""
 	}
 	toAcc, err := QueryAccount(toStr)
 	if toAcc == nil || err != nil {
 		logrus.Error("Can't get toAccount", err)
-		return Fail
+		return ""
 	}
 
 	// Get the sender's address
 	from, err := sdk.AccAddressFromBech32(fromStr)
 	if err != nil {
 		logrus.Error("Can't get fromAddress", err)
-		return Fail
+		return ""
 	}
 
 	// Get the recipient's address
 	to, err := sdk.AccAddressFromBech32(toStr)
 	if err != nil {
 		logrus.Error("Can't get toAddress", err)
-		return Fail
+		return ""
 	}
 
 	// Create a coin with the specified denomination and amount
@@ -627,14 +683,14 @@ func TransferToken(fromAddress, toAddress, denom string, amount int) int {
 	msgSend := banktypes.NewMsgSend(from, to, coin)
 	defer PrintBaseAccountInfo(fromStr, toStr)
 	// Broadcast the transaction to the blockchain network
-	_, err = gosdk.BroadcastMsgs(from, msgSend)
-
+	responseMsg, err := gosdk.BroadcastMsgs(from, msgSend)
 	if err != nil {
 		logrus.Error("Error BroadcastMsgs", err)
-		return Fail
+		return ""
 	}
 
-	return Success
+	txHash := responseMsg.TxHash
+	return txHash
 }
 
 //export ExecuteWasmContract
