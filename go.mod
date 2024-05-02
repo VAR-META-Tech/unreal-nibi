@@ -3,8 +3,8 @@ module github.com/VAR-META-Tech/unreal-nibi
 go 1.22.0
 
 require (
+	github.com/AnhVAR/gonibi v0.0.7
 	github.com/CosmWasm/wasmd v0.44.0
-	github.com/Unique-Divine/gonibi v0.0.5
 	github.com/cosmos/cosmos-sdk v0.47.5
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/sirupsen/logrus v1.9.0
@@ -32,6 +32,7 @@ require (
 	github.com/CosmWasm/wasmvm v1.5.0 // indirect
 	github.com/NibiruChain/collections v0.3.0 // indirect
 	github.com/NibiruChain/nibiru v0.21.7 // indirect
+	github.com/Unique-Divine/gonibi v0.0.5 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/aws/aws-sdk-go v1.44.203 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

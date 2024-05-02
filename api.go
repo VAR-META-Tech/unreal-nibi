@@ -50,8 +50,8 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/AnhVAR/gonibi"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/Unique-Divine/gonibi"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -1085,7 +1085,7 @@ func DeleteAccount(keyName *C.char, password *C.char) C.int {
 // It returns Success if the transaction is successful, otherwise Fail.
 //
 //export TransferToken
-func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
+func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) *C.char {
 	logrus.Info("Initiating token transfer")
 	// Convert C strings to Go strings
 	fromStr := C.GoString(fromAddress)
@@ -1101,20 +1101,20 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 	}).Info("Transfer details")
 
 	// Print account information before the transaction
-	PrintBaseAccountInfo(fromStr, toStr)
+	// PrintBaseAccountInfo(fromStr, toStr)
 
 	// Parse the sender's address
 	from, err := sdk.AccAddressFromBech32(fromStr)
 	if err != nil {
 		logrus.WithError(err).WithField("fromAddress", fromStr).Error("Failed to parse sender address")
-		return Fail
+		return nil
 	}
 
 	// Parse the recipient's address
 	to, err := sdk.AccAddressFromBech32(toStr)
 	if err != nil {
 		logrus.WithError(err).WithField("toAddress", toStr).Error("Failed to parse recipient address")
-		return Fail
+		return nil
 	}
 
 	// Create a coin with the specified denomination and amount
@@ -1124,21 +1124,23 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 	msgSend := banktypes.NewMsgSend(from, to, coins)
 
 	// Broadcast the transaction to the blockchain network
-	_, err = gosdk.BroadcastMsgs(from, msgSend)
+	responseMsg, err := gosdk.BroadcastMsgs(from, msgSend)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to broadcast token transfer message")
-		return Fail
+		return nil
 	}
 
 	// Print account information after the transaction
-	defer PrintBaseAccountInfo(fromStr, toStr)
-
+	// defer PrintBaseAccountInfo(fromStr, toStr)
+	txHash := responseMsg.TxHash
 	logrus.WithFields(logrus.Fields{
-		"from": fromStr,
-		"to":   toStr,
+		"from":   fromStr,
+		"to":     toStr,
+		"txHash": responseMsg,
 	}).Info("Token transfer executed successfully")
 
-	return Success
+	// Return the transaction hash as a C string.
+	return C.CString(txHash)
 }
 
 // ExecuteWasmContract executes a smart contract on the blockchain using the specified parameters.

@@ -47,8 +47,8 @@ int main()
 
     BaseAccount *baseAccAdmin = QueryAccount(adminAddress);
     BaseAccount *baseAcc = QueryAccount(address);
-    int testTx = TransferToken(adminAddress, address, "unibi", 10000);
-    if (testTx != 0)
+    char *testTx = TransferToken(address, "nibi1dgmut4ed90ka7qze5smllk3asd6nkl3du6grwa" , "unibi", 1000000);
+    if (testTx == NULL)
     {
         printf("Failed to Test transfer\n");
         return 1;
