@@ -161,7 +161,7 @@ func init() {
 	// Attempt to establish a gRPC connection using the local network configuration.
 	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
 	if err != nil {
-		logrus.WithError(err).Fatalf("Failed to initialize gRPC connection with endpoint %s", networkInfo.GrpcEndpoint)
+		logrus.WithError(err).Error("Failed to initialize gRPC connection with endpoint ", networkInfo.GrpcEndpoint)
 	} else {
 		logrus.WithField("endpoint", networkInfo.GrpcEndpoint).Info("gRPC connection established successfully")
 	}
@@ -169,7 +169,7 @@ func init() {
 	// Initialize the Nibiru client with the obtained gRPC connection.
 	gosdk, err = gonibi.NewNibiruClient(networkInfo.ChainID, grpcConn, networkInfo.TmRpcEndpoint)
 	if err != nil {
-		logrus.WithError(err).Fatalf("Failed to initialize Nibiru client for chain ID %s", networkInfo.ChainID)
+		logrus.WithError(err).Error("Failed to initialize Nibiru client for chain ID ", networkInfo.ChainID)
 	} else {
 		logrus.WithFields(logrus.Fields{
 			"chainID":     networkInfo.ChainID,
@@ -564,7 +564,7 @@ func NewNibiruClient(chainId *C.char, grpcEndpoint *C.char, rpcEndpoint *C.char)
 	}).Info("Attempting to initialize new Nibiru client")
 
 	// Establish a gRPC connection using the specified endpoint.
-	grpcConn, err := gonibi.GetGRPCConnection(grpcEndpointStr, true, 2)
+	grpcConn, err := gonibi.GetGRPCConnection(grpcEndpointStr, false, 2)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"grpcEndpoint": grpcEndpointStr,
@@ -1085,7 +1085,7 @@ func DeleteAccount(keyName *C.char, password *C.char) C.int {
 // It returns Success if the transaction is successful, otherwise Fail.
 //
 //export TransferToken
-func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
+func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) *C.char {
 	logrus.Info("Initiating token transfer")
 	// Convert C strings to Go strings
 	fromStr := C.GoString(fromAddress)
@@ -1101,20 +1101,20 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 	}).Info("Transfer details")
 
 	// Print account information before the transaction
-	PrintBaseAccountInfo(fromStr, toStr)
+	// PrintBaseAccountInfo(fromStr, toStr)
 
 	// Parse the sender's address
 	from, err := sdk.AccAddressFromBech32(fromStr)
 	if err != nil {
 		logrus.WithError(err).WithField("fromAddress", fromStr).Error("Failed to parse sender address")
-		return Fail
+		return nil
 	}
 
 	// Parse the recipient's address
 	to, err := sdk.AccAddressFromBech32(toStr)
 	if err != nil {
 		logrus.WithError(err).WithField("toAddress", toStr).Error("Failed to parse recipient address")
-		return Fail
+		return nil
 	}
 
 	// Create a coin with the specified denomination and amount
@@ -1124,21 +1124,23 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) C.int {
 	msgSend := banktypes.NewMsgSend(from, to, coins)
 
 	// Broadcast the transaction to the blockchain network
-	_, err = gosdk.BroadcastMsgs(from, msgSend)
+	responseMsg, err := gosdk.BroadcastMsgs(from, msgSend)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to broadcast token transfer message")
-		return Fail
+		return nil
 	}
 
 	// Print account information after the transaction
-	defer PrintBaseAccountInfo(fromStr, toStr)
-
+	// defer PrintBaseAccountInfo(fromStr, toStr)
+	txHash := responseMsg.TxHash
 	logrus.WithFields(logrus.Fields{
-		"from": fromStr,
-		"to":   toStr,
+		"from":   fromStr,
+		"to":     toStr,
+		"txHash": responseMsg,
 	}).Info("Token transfer executed successfully")
 
-	return Success
+	// Return the transaction hash as a C string.
+	return C.CString(txHash)
 }
 
 // ExecuteWasmContract executes a smart contract on the blockchain using the specified parameters.

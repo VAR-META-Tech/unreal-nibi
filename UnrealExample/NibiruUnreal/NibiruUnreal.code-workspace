@@ -6,95 +6,17 @@
 		},
 		{
 			"name": "UE5",
-			"path": "/Users/Shared/Epic Games/UE_5.3"
+			"path": "/Users/Shared/Epic Games/UE_5.4"
 		}
 	],
 	"settings": {
 		"typescript.tsc.autoDetect": "off",
-		"npm.autoDetect": "off",
-		"files.associations": {
-			"__bit_reference": "cpp",
-			"__config": "cpp",
-			"__hash_table": "cpp",
-			"__locale": "cpp",
-			"__node_handle": "cpp",
-			"__split_buffer": "cpp",
-			"__threading_support": "cpp",
-			"__tree": "cpp",
-			"__verbose_abort": "cpp",
-			"any": "cpp",
-			"array": "cpp",
-			"bitset": "cpp",
-			"cctype": "cpp",
-			"cfenv": "cpp",
-			"charconv": "cpp",
-			"cinttypes": "cpp",
-			"clocale": "cpp",
-			"cmath": "cpp",
-			"codecvt": "cpp",
-			"complex": "cpp",
-			"condition_variable": "cpp",
-			"csignal": "cpp",
-			"cstdarg": "cpp",
-			"cstddef": "cpp",
-			"cstdint": "cpp",
-			"cstdio": "cpp",
-			"cstdlib": "cpp",
-			"cstring": "cpp",
-			"ctime": "cpp",
-			"cwchar": "cpp",
-			"cwctype": "cpp",
-			"deque": "cpp",
-			"execution": "cpp",
-			"forward_list": "cpp",
-			"fstream": "cpp",
-			"future": "cpp",
-			"initializer_list": "cpp",
-			"iomanip": "cpp",
-			"ios": "cpp",
-			"iosfwd": "cpp",
-			"iostream": "cpp",
-			"istream": "cpp",
-			"limits": "cpp",
-			"list": "cpp",
-			"locale": "cpp",
-			"map": "cpp",
-			"mutex": "cpp",
-			"new": "cpp",
-			"optional": "cpp",
-			"ostream": "cpp",
-			"queue": "cpp",
-			"ratio": "cpp",
-			"regex": "cpp",
-			"scoped_allocator": "cpp",
-			"set": "cpp",
-			"shared_mutex": "cpp",
-			"span": "cpp",
-			"sstream": "cpp",
-			"stack": "cpp",
-			"stdexcept": "cpp",
-			"streambuf": "cpp",
-			"string": "cpp",
-			"string_view": "cpp",
-			"strstream": "cpp",
-			"tuple": "cpp",
-			"typeinfo": "cpp",
-			"unordered_map": "cpp",
-			"unordered_set": "cpp",
-			"valarray": "cpp",
-			"variant": "cpp",
-			"vector": "cpp",
-			"algorithm": "cpp",
-			"*.ipp": "cpp"
-		}
+		"npm.autoDetect": "off"
 	},
 	"extensions": {
 		"recommendations": [
 			"ms-vscode.cpptools",
-			"ms-dotnettools.csharp",
-			"vadimcn.vscode-lldb",
-			"ms-vscode.mono-debug",
-			"dfarley1.file-picker"
+			"ms-dotnettools.csharp"
 		]
 	},
 	"tasks": {
@@ -108,13 +30,13 @@
 					"NibiruUnreal",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -125,7 +47,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -134,7 +56,7 @@
 				],
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -145,14 +67,14 @@
 					"NibiruUnreal",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -163,13 +85,13 @@
 					"NibiruUnreal",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -180,7 +102,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -189,7 +111,7 @@
 				],
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -200,14 +122,14 @@
 					"NibiruUnreal",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -218,13 +140,13 @@
 					"NibiruUnreal",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -235,7 +157,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -244,7 +166,7 @@
 				],
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -255,14 +177,14 @@
 					"NibiruUnreal",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -273,13 +195,13 @@
 					"NibiruUnreal",
 					"Mac",
 					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -290,7 +212,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -299,7 +221,7 @@
 				],
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -310,14 +232,14 @@
 					"NibiruUnreal",
 					"Mac",
 					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -328,13 +250,13 @@
 					"NibiruUnreal",
 					"Mac",
 					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -345,7 +267,7 @@
 					"NibiruUnreal",
 					"Mac",
 					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -354,7 +276,7 @@
 				],
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -365,289 +287,14 @@
 					"NibiruUnreal",
 					"Mac",
 					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Debug Build",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Debug Rebuild",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"dependsOn": [
-					"NibiruUnreal IOS Debug Clean"
-				],
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Debug Clean",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex",
-					"-clean"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS DebugGame Build",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS DebugGame Rebuild",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"dependsOn": [
-					"NibiruUnreal IOS DebugGame Clean"
-				],
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS DebugGame Clean",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex",
-					"-clean"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Development Build",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Development Rebuild",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"dependsOn": [
-					"NibiruUnreal IOS Development Clean"
-				],
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Development Clean",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex",
-					"-clean"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Test Build",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Test Rebuild",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"dependsOn": [
-					"NibiruUnreal IOS Test Clean"
-				],
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Test Clean",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Test",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex",
-					"-clean"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Shipping Build",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Shipping Rebuild",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex"
-				],
-				"problemMatcher": "$msCompile",
-				"dependsOn": [
-					"NibiruUnreal IOS Shipping Clean"
-				],
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
-				}
-			},
-			{
-				"label": "NibiruUnreal IOS Shipping Clean",
-				"group": "build",
-				"command": "Engine/Build/BatchFiles/Mac/Build.sh",
-				"args": [
-					"NibiruUnreal",
-					"IOS",
-					"Shipping",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
-					"-waitmutex",
-					"-clean"
-				],
-				"problemMatcher": "$msCompile",
-				"type": "shell",
-				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -658,13 +305,13 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -675,7 +322,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -684,7 +331,7 @@
 				],
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -695,14 +342,14 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Debug",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -713,13 +360,13 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -730,7 +377,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -739,7 +386,7 @@
 				],
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -750,14 +397,14 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"DebugGame",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -768,13 +415,13 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -785,7 +432,7 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex"
 				],
 				"problemMatcher": "$msCompile",
@@ -794,7 +441,7 @@
 				],
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			},
 			{
@@ -805,14 +452,14 @@
 					"NibiruUnrealEditor",
 					"Mac",
 					"Development",
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-waitmutex",
 					"-clean"
 				],
 				"problemMatcher": "$msCompile",
 				"type": "shell",
 				"options": {
-					"cwd": "/Users/Shared/Epic Games/UE_5.3"
+					"cwd": "/Users/Shared/Epic Games/UE_5.4"
 				}
 			}
 		]
@@ -823,84 +470,84 @@
 			{
 				"name": "Launch NibiruUnreal (Debug)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Debug.app/Contents/MacOS/UnrealGame-Mac-Debug",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Debug.app/Contents/MacOS/UnrealGame-Mac-Debug",
 				"preLaunchTask": "NibiruUnreal Mac Debug Build",
 				"args": [
 				],
-				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"cwd": "/Users/Shared/Epic Games/UE_5.4",
 				"type": "lldb"
 			},
 			{
 				"name": "Launch NibiruUnreal (DebugGame)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-DebugGame.app/Contents/MacOS/UnrealGame-Mac-DebugGame",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-DebugGame.app/Contents/MacOS/UnrealGame-Mac-DebugGame",
 				"preLaunchTask": "NibiruUnreal Mac DebugGame Build",
 				"args": [
 				],
-				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"cwd": "/Users/Shared/Epic Games/UE_5.4",
 				"type": "lldb"
 			},
 			{
 				"name": "Launch NibiruUnreal (Development)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame.app/Contents/MacOS/UnrealGame",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame.app/Contents/MacOS/UnrealGame",
 				"preLaunchTask": "NibiruUnreal Mac Development Build",
 				"args": [
 				],
-				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"cwd": "/Users/Shared/Epic Games/UE_5.4",
 				"type": "lldb"
 			},
 			{
 				"name": "Launch NibiruUnreal (Test)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Test.app/Contents/MacOS/UnrealGame-Mac-Test",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Test.app/Contents/MacOS/UnrealGame-Mac-Test",
 				"preLaunchTask": "NibiruUnreal Mac Test Build",
 				"args": [
 				],
-				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"cwd": "/Users/Shared/Epic Games/UE_5.4",
 				"type": "lldb"
 			},
 			{
 				"name": "Launch NibiruUnreal (Shipping)",
 				"request": "launch",
-				"program": "/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Shipping.app/Contents/MacOS/UnrealGame-Mac-Shipping",
+				"program": "/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/Binaries/Mac/UnrealGame-Mac-Shipping.app/Contents/MacOS/UnrealGame-Mac-Shipping",
 				"preLaunchTask": "NibiruUnreal Mac Shipping Build",
 				"args": [
 				],
-				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"cwd": "/Users/Shared/Epic Games/UE_5.4",
 				"type": "lldb"
 			},
 			{
 				"name": "Launch NibiruUnrealEditor (Debug)",
 				"request": "launch",
-				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Binaries/Mac/UnrealEditor-Mac-Debug.app/Contents/MacOS/UnrealEditor-Mac-Debug",
+				"program": "/Users/Shared/Epic Games/UE_5.4/Engine/Binaries/Mac/UnrealEditor-Mac-Debug.app/Contents/MacOS/UnrealEditor-Mac-Debug",
 				"preLaunchTask": "NibiruUnrealEditor Mac Debug Build",
 				"args": [
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
 				],
-				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"cwd": "/Users/Shared/Epic Games/UE_5.4",
 				"type": "lldb"
 			},
 			{
 				"name": "Launch NibiruUnrealEditor (DebugGame)",
 				"request": "launch",
-				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Binaries/Mac/UnrealEditor-Mac-DebugGame.app/Contents/MacOS/UnrealEditor-Mac-DebugGame",
+				"program": "/Users/Shared/Epic Games/UE_5.4/Engine/Binaries/Mac/UnrealEditor-Mac-DebugGame.app/Contents/MacOS/UnrealEditor-Mac-DebugGame",
 				"preLaunchTask": "NibiruUnrealEditor Mac DebugGame Build",
 				"args": [
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
 				],
-				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"cwd": "/Users/Shared/Epic Games/UE_5.4",
 				"type": "lldb"
 			},
 			{
 				"name": "Launch NibiruUnrealEditor (Development)",
 				"request": "launch",
-				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Binaries/Mac/UnrealEditor.app/Contents/MacOS/UnrealEditor",
+				"program": "/Users/Shared/Epic Games/UE_5.4/Engine/Binaries/Mac/UnrealEditor.app/Contents/MacOS/UnrealEditor",
 				"preLaunchTask": "NibiruUnrealEditor Mac Development Build",
 				"args": [
-					"/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
+					"/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject"
 				],
-				"cwd": "/Users/Shared/Epic Games/UE_5.3",
+				"cwd": "/Users/Shared/Epic Games/UE_5.4",
 				"type": "lldb"
 			},
 			{
@@ -908,11 +555,11 @@
 				"type": "coreclr",
 				"request": "launch",
 				"preLaunchTask": "UnrealBuildTool Mac Development Build",
-				"program": "/Users/Shared/Epic Games/UE_5.3/Engine/Build/BatchFiles/RunUBT.bat",
+				"program": "/Users/Shared/Epic Games/UE_5.4/Engine/Build/BatchFiles/RunUBT.bat",
 				"args": [
 					"-projectfiles",
 					"-vscode",
-					"-project=/Users/anhnph/Downloads/Work/Products/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
+					"-project=/Users/cloudsguitar/Desktop/unreal-nibi/UnrealExample/NibiruUnreal/NibiruUnreal.uproject",
 					"-game",
 					"-engine",
 					"-dotnet"
@@ -920,7 +567,7 @@
 				"console": "internalConsole",
 				"internalConsoleOptions": "openOnSessionStart",
 				"stopAtEntry": false,
-				"cwd": "/Users/Shared/Epic Games/UE_5.3"
+				"cwd": "/Users/Shared/Epic Games/UE_5.4"
 			}
 		]
 	}

@@ -188,7 +188,7 @@ extern int DeleteAccount(char* keyName, char* password);
 // TransferToken transfers specified amount of tokens from one address to another.
 // It returns Success if the transaction is successful, otherwise Fail.
 //
-extern int TransferToken(char* fromAddress, char* toAddress, char* denom, int amount);
+extern char* TransferToken(char* fromAddress, char* toAddress, char* denom, int amount);
 
 // ExecuteWasmContract executes a smart contract on the blockchain using the specified parameters.
 // It returns a pointer to a C string containing the transaction hash, or nil if an error occurs.
