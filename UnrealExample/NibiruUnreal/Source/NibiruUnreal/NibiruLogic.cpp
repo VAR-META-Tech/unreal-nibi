@@ -98,7 +98,7 @@ void UNibiruLogic::OnFaucetClicked(FString address_received, bool &IsSuccess, FS
     auto convertedStr = StringCast<ANSICHAR>(*address_received);
     const char* toAddress = convertedStr.Get();
     char *demon = strdup("unibi");
-    char* tx = TransferToken(adminAddress, (char*)toAddress, demon, 250);
+    char* tx = TransferToken(adminAddress, (char*)toAddress, demon, 11000000);
     if (tx == NULL)
     {
         error_return = "Failed to transfer";
