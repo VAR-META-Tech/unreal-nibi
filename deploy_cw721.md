@@ -10,7 +10,7 @@ cd <to folder store cw721_base.wasm file>
 
 Follow this link to install nibid: https://nibiru.fi/docs/dev/cli/nibid-binary.html
 
-### Setup your nibid config, make sure you run nibiru localnet
+### Set up your nibid config, make sure you run nibiru localnet
 
 ```sh
 nibid config chain-id nibiru-localnet-0 && \
@@ -50,7 +50,7 @@ nibid q tx $TXHASH > txhash.json
 CODE_ID="$(cat txhash.json | jq -r '.logs[0].events[1].attributes[1].value')"
 ```
 
-### Create a inst.json file:
+### Create an inst.json file:
 
 `inst.json`
 
@@ -94,7 +94,7 @@ nibid q tx $TXHASH_INIT > txhash.init.json
 CONTRACT_ADDRESS="$(cat txhash.init.json | jq -r '.logs[0].events[1].attributes[0].value')"
 ```
 
-## Once you have the CONTRACT_ADDRESS. You good to mint an NFT with this code example
+## Once you have the CONTRACT_ADDRESS, you can mint an NFT with this code example
 
 ```c
 const adminAddress = "nibi1zaavvzxez0elundtn32qnk9lkm8kmcsz44g7xl"
