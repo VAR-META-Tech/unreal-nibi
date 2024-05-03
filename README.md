@@ -7,6 +7,9 @@ Unreal-Nibi-SDK is a cpp package written in C++ to help developers integrate Nib
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Unreal-Nibi-SDK with Blueprint](#using-unreal-nibi-sdk-with-blueprint)
+- [Go API](#go-api)
+- [Testing](#testing)
+- [Deploy CW721 contract](#testing)
 
 ### Project Layout
 
@@ -126,3 +129,21 @@ public class NibiruUnreal : ModuleRules
 ### License
 
 This project is licensed under the Apache-2.0 License. Refer to the LICENSE.txt file for details.
+
+### Testing
+
+To run unit test. You can do the following cmd:
+
+```sh
+go test ./test/...
+```
+
+### Go API
+
+You can check out this file to see what APIs we using: [gonibi.md](./gonibi.md)
+
+### Deploy CW721 contract
+
+The CW721 contract is a specification for non-fungible tokens (NFTs) built on the CosmWasm platform. Inspired by Ethereum's ERC721 standard, CW721 introduces enhancements tailored to the CosmWasm ecosystem. These enhancements aim to provide a robust framework for creating and managing NFTs within decentralized applications (dApps) on the CosmWasm network.
+
+You can check out this file to see how to deploy CW721 contract and Mint an NFT [./deploy_cw721.md](./deploy_cw721.md)

@@ -1,5 +1,12 @@
 # Go API
 
+# [Wallet](#wallet)
+
+- [CreateAccount](#createaccount)
+- [ImportAccountFromMnemoic](#importaccountfrommnemoic)
+- [ImportAccountFromPrivateKey](#importaccountfromprivatekey)
+- [DeleteAccount](#deleteaccount)
+
 # [Queries](#queries)
 
 - [GetPrivKeyFromMnemonic](#getprivkeyfrommnemonic)
@@ -10,16 +17,44 @@
 
 # [Transactions](#transactions)
 
-- [CreateAccount](#createaccount)
-- [ImportAccountFromMnemoic](#importaccountfrommnemoic)
-- [ImportAccountFromPrivateKey](#importaccountfromprivatekey)
-- [DeleteAccount](#deleteaccount)
 - [TransferToken](#transfertoken)
 - [ExecuteWasmContract](#executewasmcontract)
 
 # [Other](#other)
 
 - [Network](#network)
+
+## Wallet
+
+### CreateAccount
+
+```go
+phrase := "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host"
+isSuccess := CreateAccount("test_key", phrase, "pass")
+```
+
+### ImportAccountFromMnemoic
+
+```go
+phrase := GenerateRecoveryPhrase()
+check := ImportAccountFromMnemoic(phrase, "test_key")
+```
+
+### ImportAccountFromPrivateKey
+
+```go
+phrase := GenerateRecoveryPhrase()
+keyName := "TestKey"
+privKey := GetPrivKeyFromMnemonic(phrase, keyName)
+```
+
+### DeleteAccount
+
+```go
+phrase := GenerateRecoveryPhrase()
+CreateAccount("test_key", phrase, "pass")
+check := DeleteAccount("test_key", "pass")
+```
 
 ## Queries
 
@@ -86,36 +121,6 @@ txResult := QueryTXHash(txHash)
 ```
 
 ## Transactions
-
-### CreateAccount
-
-```go
-phrase := "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host"
-isSuccess := CreateAccount("test_key", phrase, "pass")
-```
-
-### ImportAccountFromMnemoic
-
-```go
-phrase := GenerateRecoveryPhrase()
-check := ImportAccountFromMnemoic(phrase, "test_key")
-```
-
-### ImportAccountFromPrivateKey
-
-```go
-phrase := GenerateRecoveryPhrase()
-keyName := "TestKey"
-privKey := GetPrivKeyFromMnemonic(phrase, keyName)
-```
-
-### DeleteAccount
-
-```go
-phrase := GenerateRecoveryPhrase()
-CreateAccount("test_key", phrase, "pass")
-check := DeleteAccount("test_key", "pass")
-```
 
 ### TransferToken
 

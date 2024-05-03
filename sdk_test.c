@@ -6,93 +6,69 @@
 
 int main()
 {
-    // Create a new NibiruClient instance using the exported Go function.
-    // int ret = NewNibiruClientDefault();
-    // if (ret != 0)
-    // {
-    //     printf("Failed to create NibiruClient\n");
-    //     return 1;
-    // }
-
+    // Switch to the test network
     SwitchNetwork("test");
 
+    // Define key names and mnemonics
     char *keyNameAdmin = "AdminKey";
     char *keyName = "TestKey";
-    // Create new wallet
-    // Generate Menomonic
-    char *testMnemonic = "toe cream coach quiz cactus nest spike gauge opinion legal father stadium lizard match wood immune odor depart sauce timber crash pig thought seat";
     char *adminMnemonic = "guard cream sadness conduct invite crumble clock pudding hole grit liar hotel maid produce squeeze return argue turtle know drive eight casino maze host";
-
-    // Create key(private,public =>signner) from menemonic
+    char *testMnemonic = "toe cream coach quiz cactus nest spike gauge opinion legal father stadium lizard match wood immune odor depart sauce timber crash pig thought seat";
     char *passPhrase = "";
-    int createAdminAccount = CreateAccount(keyNameAdmin, adminMnemonic, "");
-    if (createAdminAccount != 0)
+
+    // Create accounts
+    if (CreateAccount(keyNameAdmin, adminMnemonic, passPhrase) != 0 ||
+        CreateAccount(keyName, testMnemonic, passPhrase) != 0)
     {
-        printf("Failed to create account\n");
-        return 1;
-    }
-    int createAccount = CreateAccount(keyName, testMnemonic, passPhrase);
-    if (createAccount != 0)
-    {
-        printf("Failed to create account\n");
+        fprintf(stderr, "Failed to create accounts\n");
         return 1;
     }
 
-    // Get account address
-    char *address = GetAddressFromKeyName(keyName);
+    // Print account addresses
+    printf("AdminKey Address: %s\n", GetAddressFromKeyName(keyNameAdmin));
+    printf("TestKey Address: %s\n", GetAddressFromKeyName(keyName));
+
     char *adminAddress = GetAddressFromKeyName(keyNameAdmin);
+    char *testAddress = GetAddressFromKeyName(keyName);
 
-    printf("Admin Address: %s\n", adminAddress);
-    printf("Account Address: %s\n", address);
+    char *denom = "unibi";
 
-    BaseAccount *baseAccAdmin = QueryAccount(adminAddress);
-    BaseAccount *baseAcc = QueryAccount(address);
-    char *testTx = TransferToken(address, "nibi1dgmut4ed90ka7qze5smllk3asd6nkl3du6grwa" , "unibi", 1000000);
+    // Transfer token from AdminKey to TestKey
+    printf("Transferring tokens from AdminKey to TestKey...\n");
+    char *testTx = TransferToken(adminAddress, testAddress, denom, 250);
     if (testTx == NULL)
     {
-        printf("Failed to Test transfer\n");
+        fprintf(stderr, "Failed to transfer tokens\n");
         return 1;
     }
-
+    printf("Transfer successful. Transaction hash: %s\n", testTx);
     sleep(3);
-    char *testTx2 = ExecuteWasmContract(adminAddress, "nibi1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3slkhcux",
-                                        "{\"mint\": {\"token_id\": \"unique-nft-15\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}",
-                                        "unibi", 1);
+
+    // Execute Wasm contract
+    printf("Executing Wasm contract...\n");
+    // Payload for minting a new NFT
+    char *payload = "{\"mint\": {\"token_id\": \"unique-nft-15\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}";
+    // Address of the deployed contract
+    char *contractAddress = "nibi1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3slkhcux";
+    char *testTx2 = ExecuteWasmContract(adminAddress, contractAddress, payload, denom, 1);
     if (testTx2 == NULL)
     {
-        printf("Failed to Test ExecuteWasmContract\n");
+        fprintf(stderr, "Failed to execute Wasm contract\n");
         return 1;
     }
-    else
-    {
-        printf("TxHash %s\n", testTx2);
-    }
-
+    printf("Execution successful. Transaction hash: %s\n", testTx2);
     sleep(3);
 
-    char *testTx3 = QueryTXHash(testTx2);
-    if (testTx3 == NULL)
-    {
-        printf("Failed to Test QueryTXHash\n");
-        return 1;
-    }
-    else
-    {
-        printf("TxHash result %s\n", testTx3);
-    }
-
-    sleep(3);
-    char *testTx4 = QueryWasmContract("nibi1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3slkhcux",
-                                      "{\"owner_of\": {\"token_id\": \"unique-nft-15\", \"include_expired\": false}}");
+    // Query Wasm contract for NFT ownership
+    printf("Querying Wasm contract for NFT ownership...\n");
+    char *query = "{\"owner_of\": {\"token_id\": \"unique-nft-15\", \"include_expired\": false}}";
+    char *testTx4 = QueryWasmContract(contractAddress, query);
     if (testTx4 == NULL)
     {
-        printf("Failed to Test QueryWasmContract\n");
+        fprintf(stderr, "Failed to query Wasm contract\n");
         return 1;
     }
-    else
-    {
-        printf("Reponse %s\n", testTx4);
-    }
+    printf("Query successful. Response: %s\n", testTx4);
 
     return 0;
 }
