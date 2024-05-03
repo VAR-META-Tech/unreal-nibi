@@ -7,6 +7,8 @@ Unreal-Nibi-SDK is a cpp package written in C++ to help developers integrate Nib
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Unreal-Nibi-SDK with Blueprint](#using-unreal-nibi-sdk-with-blueprint)
+- [Go API](#go-api)
+- [Testing](#testing)
 
 ### Project Layout
 
@@ -126,3 +128,15 @@ public class NibiruUnreal : ModuleRules
 ### License
 
 This project is licensed under the Apache-2.0 License. Refer to the LICENSE.txt file for details.
+
+### Testing
+
+To run unit test. You can do the following cmd:
+
+```sh
+go test ./test/...
+```
+
+### Go API
+
+You can check out this file to see what APIs we using: [gonibi.md](./gonibi.md)
