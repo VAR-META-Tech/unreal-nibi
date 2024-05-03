@@ -1,6 +1,6 @@
 # Go API
 
-# [Account](#account)
+# [Wallet](#wallet)
 
 - [CreateAccount](#createaccount)
 - [ImportAccountFromMnemoic](#importaccountfrommnemoic)
@@ -24,7 +24,7 @@
 
 - [Network](#network)
 
-## Account
+## Wallet
 
 ### CreateAccount
 
