@@ -50,8 +50,8 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/AnhVAR/gonibi"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/Unique-Divine/gonibi"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
