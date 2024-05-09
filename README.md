@@ -5,7 +5,7 @@ Unreal-Nibi-SDK is a cpp package written in C++ to help developers integrate Nib
 - [Project Layout](#project-layout)
 - [Features](#features)
 - [Requirements](#requirements)
-- [Installation](#installation)
+- [Installation (For Mac)](#installation)
 - [Unreal-Nibi-SDK with Blueprint](#using-unreal-nibi-sdk-with-blueprint)
 - [Go API](#go-api)
 - [Testing](#testing)
@@ -29,7 +29,7 @@ Unreal-Nibi-SDK is a cpp package written in C++ to help developers integrate Nib
 
 | Platforms   | Unreal Version   | Installation         | Status       |
 | ----------- | ---------------- | -------------------- | ------------ |
-| Mac / Linux | Unity engine 5.4 | 3rd lib build config | Fully Tested |
+| MacOS | Unity engine 5.4 | 3rd lib build config | Fully Tested |
 
 ### Installation
 
@@ -80,11 +80,13 @@ https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/2ceed8bf-ab29-4a10-
 
 ### Example Unreal Project
 
-A examples unreal project can be found in the following path:  
-`./UnrealExample/NibiruUnreal.uproject`. Simply open that file with Unreal to run the example
+An Example unreal project can be found in the following path:  
+`./UnrealExample/NibiruUnreal.uproject`. 
+Simply open that file with Unreal to run the example.
 
 https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/c9c6f4df-0181-4a28-bb50-2c6ddaad1afd
 
+### Integration sdk lib with Unreal Project
 For Unreal project please reference example in `NibiruUnreal`, you need define Build.cs to integration `unreal_nibi_sdk` library with Unreal engine.
 Here is an example:
 
