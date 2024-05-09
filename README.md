@@ -61,6 +61,7 @@ Follow these steps to set up the project environment:
    ```
 2. Build the project:
    ```sh
+   rm -f unreal_nibi_sdk.dylib
    go build -o unreal_nibi_sdk.dylib -buildmode=c-shared ./api.go
    ```
 3. To check Project Build Success and Test some function in Project:
@@ -79,8 +80,8 @@ https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/2ceed8bf-ab29-4a10-
 
 ### Example Unreal Project
 
-A examples unreal project can be found in the following directory:  
-`UnrealExample/`.
+A examples unreal project can be found in the following path:  
+`./UnrealExample/NibiruUnreal.uproject`. Simply open that file with Unreal to run the example
 
 https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/c9c6f4df-0181-4a28-bb50-2c6ddaad1afd
 
@@ -126,10 +127,6 @@ public class NibiruUnreal : ModuleRules
 **Faucet**
 ![](./Resource/Faucet.png)
 
-### License
-
-This project is licensed under the Apache-2.0 License. Refer to the LICENSE.txt file for details.
-
 ### Testing
 
 To run unit test. You can do the following cmd:
@@ -147,3 +144,7 @@ You can check out this file to see what APIs we using: [gonibi.md](./gonibi.md)
 The CW721 contract is a specification for non-fungible tokens (NFTs) built on the CosmWasm platform. Inspired by Ethereum's ERC721 standard, CW721 introduces enhancements tailored to the CosmWasm ecosystem. These enhancements aim to provide a robust framework for creating and managing NFTs within decentralized applications (dApps) on the CosmWasm network.
 
 You can check out this file to see how to deploy CW721 contract and Mint an NFT [./deploy_cw721.md](./deploy_cw721.md)
+
+### License
+
+This project is licensed under the Apache-2.0 License. Refer to the LICENSE.txt file for details.
