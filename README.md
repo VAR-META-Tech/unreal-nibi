@@ -82,9 +82,28 @@ https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/2ceed8bf-ab29-4a10-
 
 An Example unreal project can be found in the following path:  
 `./UnrealExample/NibiruUnreal.uproject`. 
-Simply open that file with Unreal to run the example.
 
 https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/c9c6f4df-0181-4a28-bb50-2c6ddaad1afd
+
+Follow these steps to run the Unreal Project Demo:
+1. Click `NibiruUnreal.uproject` in the `./UnrealExample/NibiruUnreal/NibiruUnreal.uproject` and waiting for Unreal open this project.
+   
+   ![](./Resource/OpenUnreal.png)
+
+2. To run Unreal Project you need to open NibiruLevel  and Click Button Play:
+   ![](./Resource/HowToRunDemoUnreal.png)
+
+  **NOTE: You can see NibiruLevel into Content Drawer:**
+
+3. After Click Button Play : The project is now ready for Demo.
+   
+    ![](./Resource/NiBiRuUIUnreal.png)
+
+4. To view the Unreal C++ code, you can open `NibiruUnreal.code-workspace` in the `./UnrealExample/NibiruUnreal/` by VS Code.
+
+ **NOTE: You can open NibiruUnreal.code-workspace  by Unreal Editer: Click Tools -> Open Visual Studio Code.**
+ 
+ ![](./Resource/OpenVSCodeByUnreal.png)
 
 ### Integration sdk lib with Unreal Project
 For Unreal project please reference example in `NibiruUnreal`, you need define Build.cs to integration `unreal_nibi_sdk` library with Unreal engine.
