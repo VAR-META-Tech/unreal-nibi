@@ -51,7 +51,7 @@ This guide provides step-by-step instructions for installing and setting up our 
 
 ## Project Setup
 
-Follow these steps to set up the project environment:
+You can run **setup.sh** to do all these steps to set up the project environment:
 
 1. Clone the repository and initialize submodules:
    ```sh
