@@ -156,10 +156,10 @@ func init() {
 	logrus.SetLevel(logrus.DebugLevel)
 
 	// Set the initial network information to local settings.
-	networkInfo = LocalNetworkInfo
+	networkInfo = TestNetworkInfo
 
 	// Attempt to establish a gRPC connection using the local network configuration.
-	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, false, 2)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to initialize gRPC connection with endpoint ", networkInfo.GrpcEndpoint)
 	} else {
@@ -518,7 +518,7 @@ func NewNibiruClientDefault() C.int {
 	logrus.Info("Initializing Nibiru client with default settings")
 
 	// Establish a gRPC connection using the default network information.
-	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, true, 2)
+	grpcConn, err := gonibi.GetGRPCConnection(networkInfo.GrpcEndpoint, false, 2)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"endpoint": networkInfo.GrpcEndpoint,

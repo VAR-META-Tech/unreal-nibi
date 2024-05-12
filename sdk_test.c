@@ -7,7 +7,12 @@
 int main()
 {
     // Switch to the test network
-    SwitchNetwork("test");
+    int ret = NewNibiruClientDefault();
+
+    if (ret != 0) {
+        fprintf(stderr, "Failed to connect testnet1\n");
+        return 1;
+    }
 
     // Define key names and mnemonics
     char *keyNameAdmin = "AdminKey";
@@ -49,8 +54,8 @@ int main()
     // Payload for minting a new NFT
     char *payload = "{\"mint\": {\"token_id\": \"unique-nft-15\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}";
     // Address of the deployed contract
-    char *contractAddress = "nibi1qg5ega6dykkxc307y25pecuufrjkxkaggkkxh7nad0vhyhtuhw3slkhcux";
-    char *testTx2 = ExecuteWasmContract(adminAddress, contractAddress, payload, denom, 1);
+    char *contractAddress = "nibi1xs48fjdmq0u5rg6txhrrc5n7xlxstew6pvm82hsh6ftplyuysdaqkdkzfk";
+    char *testTx2 = ExecuteWasmContract(testAddress, contractAddress, payload, denom, 1);
     if (testTx2 == NULL)
     {
         fprintf(stderr, "Failed to execute Wasm contract\n");
