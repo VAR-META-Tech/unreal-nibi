@@ -47,6 +47,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 	"unsafe"
 
@@ -1300,4 +1301,18 @@ func QueryTXHash(txHash *C.char) *C.char {
 	// Convert the transaction log into a C string to return.
 	cLog := C.CString(resultTx.TxResult.Log)
 	return cLog
+}
+
+//export SetLogFile
+func SetLogFile(path *C.char) C.int {
+	pathStr := C.GoString(path)
+	// Create a log file (or append if it exists)
+	file, err := os.OpenFile(pathStr, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err == nil {
+		logrus.SetOutput(file) // Set Logrus output to the file
+	} else {
+		logrus.Error("Failed to log to file, using default stderr")
+		return Fail
+	}
+	return Success
 }

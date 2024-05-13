@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "unreal_nibi_sdk.h"
+#if defined(_WIN64)
+#include <io.h>
+#else
 #include <unistd.h>
-
+#endif
 int main()
 {
     // Switch to the test network
