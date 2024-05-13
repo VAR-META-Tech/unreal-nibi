@@ -5,7 +5,7 @@ Unreal-Nibi-SDK is a cpp package written in C++ to help developers integrate Nib
 - [Project Layout](#project-layout)
 - [Features](#features)
 - [Requirements](#requirements)
-- [Installation (For Mac)](#installation)
+- [Installation](#installation)
 - [Unreal-Nibi-SDK with Blueprint](#using-unreal-nibi-sdk-with-blueprint)
 - [Go API](#go-api)
 - [Testing](#testing)
@@ -30,9 +30,10 @@ Unreal-Nibi-SDK is a cpp package written in C++ to help developers integrate Nib
 | Platforms   | Unreal Version   | Installation         | Status       |
 | ----------- | ---------------- | -------------------- | ------------ |
 | MacOS | Unity engine 5.4 | 3rd lib build config | Fully Tested |
+| Windows | Unity engine 5.4 | 3rd lib build config, visual studio 2022 (with desktop and game development c++)  | Fully Tested |
 
 ### Installation
-
+## FOR MACOS
 # Installation Guide
 
 This guide provides step-by-step instructions for installing and setting up our library which is compatible macOS platforms. Ensure you have the following prerequisites installed to build the project:
@@ -53,13 +54,7 @@ This guide provides step-by-step instructions for installing and setting up our 
 
 You can run **setup.sh** to do all these steps to set up the project environment:
 
-1. Clone the repository and initialize submodules:
-   ```sh
-   git clone <repository-url>
-   cd <repository-name>
-   git submodule update --init --recursive
-   ```
-2. Build the project:
+1. Build the project:
    ```sh
    rm -f unreal_nibi_sdk.dylib
    go build -o unreal_nibi_sdk.dylib -buildmode=c-shared ./api.go
@@ -76,8 +71,38 @@ You can run **setup.sh** to do all these steps to set up the project environment
 
 https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/2ceed8bf-ab29-4a10-92c0-d71f2e9a021c
 
-### macOS Specific Instructions
+## FOR WINDOWS
+# Installation Guide
 
+This guide provides step-by-step instructions for installing and setting up our library which is compatible Windows platforms. Ensure you have the following prerequisites installed to build the project:
+
+## Prerequisites
+
+**Go** : https://go.dev/doc/install
+
+**Visual Studio 2022** with C++ development environment for Desktop and Game
+<img width="500" alt="Screenshot 2024-05-13 at 07 10 38" src="https://github.com/VAR-META-Tech/unreal-nibi/assets/133180467/c8102b17-0c6d-49af-a1b4-35a2e33f9ce9">
+
+## Installation Steps
+
+1. Install **Visual Studio 2022** with C++ development environment
+2. Install Go
+3. Install Unreal 5.4.1
+
+## Project Setup
+
+Do all these steps to set up the project environment:
+
+1. Build the project:
+   ```sh
+   go build -ldflags="-w" -o unreal_nibi_sdk.dll -buildmode=c-shared ./api.go
+   ```
+3. To check Project Build Success and Test some function in Project:
+   Need copy wasmvm.dll to mingw64 path: C:\TDM-GCC-64\lib
+   ```sh
+    C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe -o sdk_test sdk_test.c unreal_nibi_sdk.dll
+    ./sdk_test.exe
+   ```
 ### Example Unreal Project
 
 An Example unreal project can be found in the following path:  
@@ -90,11 +115,21 @@ Follow these steps to run the Unreal Project Demo:
    
    ![](./Resource/OpenUnreal.png)
 
-2. To run Unreal Project you need to open NibiruLevel  and Click Button Play:
+   For windows, you should Generate Visual Studio Files
+   
+   <img width="500" alt="Screenshot 2024-05-13 at 07 30 57" src="https://github.com/VAR-META-Tech/unreal-nibi/assets/133180467/6876d3b8-e82f-4186-a176-57f468993fe2">
+   
+   After that open .sln file to build and run project example
+   
+   <img width="1508" alt="Screenshot 2024-05-13 at 07 43 17" src="https://github.com/VAR-META-Tech/unreal-nibi/assets/133180467/2b055958-bdcb-4f47-841d-f122fe964d99">
+
+   **NOTE: In Windows when you play program in first time with throw an exception, please continue to run**
+   
+3. To run Unreal Project you need to open NibiruLevel  and Click Button Play:
    ![](./Resource/HowToRunDemoUnreal.png)
 
   **NOTE: You can see NibiruLevel into Content Drawer:**
-
+	
 3. After Click Button Play : The project is now ready for Demo.
    
     ![](./Resource/NiBiRuUIUnreal.png)
@@ -130,11 +165,21 @@ public class NibiruUnreal : ModuleRules
 			PublicAdditionalLibraries.Add(Path.Combine(destinationDirectory, "unreal_nibi_sdk.dylib"));
 			PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../") });
 			PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../") });
+		} else if (Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			string unreal_nibi_sdk_LibPath = Path.Combine(ModuleDirectory, "../../../../", "unreal_nibi_sdk.dll");
+			string cosmos_LibPath = Path.Combine(ModuleDirectory, "../../../../", "wasmvm.dll");
+			string destinationDirectory = Target.ProjectFile.Directory.FullName + "/Binaries/Win64";
+			File.Copy(unreal_nibi_sdk_LibPath, Path.Combine(destinationDirectory, "unreal_nibi_sdk.dll"), true);
+			File.Copy(cosmos_LibPath, Path.Combine(destinationDirectory, "wasmvm.dll"), true);
+            //PublicDelayLoadDLLs.Add(Path.Combine(destinationDirectory, "unreal_nibi_sdk.dll"));
+            //PublicDelayLoadDLLs.Add(Path.Combine(destinationDirectory, "wasmvm.dll"));
+            PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../") });
+			PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../") });
 		}
 		CppStandard = CppStandardVersion.Cpp17;
 	}
 }
-
 ```
 
 ### Using Unreal-Nibi-SDK with Blueprint
