@@ -59,9 +59,12 @@ You can run **setup.sh** to do all these steps to set up the project environment
    rm -f unreal_nibi_sdk.dylib
    go build -o unreal_nibi_sdk.dylib -buildmode=c-shared ./api.go
    ```
-3. To check Project Build Success and Test some function in Project:
+2. To check Project Build Success 
    ```sh
     gcc -o sdk_test sdk_test.c unreal_nibi_sdk.dylib -lpthread
+   ```
+3. Test some function in Project:
+   ```sh
     ./sdk_test
    ```
 4. Settup library to use for Unreal Project:
