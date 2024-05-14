@@ -11,7 +11,7 @@
 typedef std::complex<double>  _Dcomplex;
 typedef std::complex<float>   _Fcomplex;
 #endif
-#include "unreal_nibi_sdk.h"
+#include "../../../../unreal_nibi_sdk.h"
 
 
 extern "C" {
@@ -49,7 +49,7 @@ void UNibiruLogic::OnInitApp(bool &IsCreateOk, FString &error_return)
         FPlatformProcess::FreeDllHandle(DllHandle);
         return;
     }
-    SetLogFile("D://unreal_nibi_sdk.log");
+    SetLogFile((char*)"D://unreal_nibi_sdk.log");
 #endif
     IsCreateOk = false;
     int ret = NewNibiruClientDefault();
