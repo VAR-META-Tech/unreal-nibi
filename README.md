@@ -11,47 +11,46 @@ Unreal-Nibi-SDK is a cpp package written in C++ to help developers integrate Nib
 - [Testing](#testing)
 - [Deploy CW721 contract](#testing)
 
-### Project Layout
+# Project Layout
 
 1. **`UnrealExample/`**:: This directory contains Wallet example Unreal Project using Unreal-Nibi-SDK.
 2. **`Resource/`**:: A place for various resources needed for the project, like images, data files, or other assets.
 3. **`libs/`**: This directory houses a Go package specifically designed for connecting to and interacting with the blockchain, facilitating the initialization of the client for seamless integration with the project.
 4. **`test/`**: This directory hosts Go unit test files to ensure the functionality, reliability, and performance of the associated components within the project.
 
-### Features
+# Features
 
 1. **`Creating a Wallet`**: Generate new blockchain wallets to securely manage funds and conduct transactions.
 2. **`Querying`**: Retrieve detailed information from the blockchain, such as transaction history, account balances, or smart contract data.
 3. **`Transfer Token`**: Seamlessly transfer tokens between blockchain addresses with built-in security measures.
 4. **`Mint NFT`**: Create unique and non-fungible tokens (NFTs) on the blockchain, enabling the creation and management of digital assets.
 
-### Requirements
+# Requirements
 
 | Platforms   | Unreal Version   | Installation         | Status       |
 | ----------- | ---------------- | -------------------- | ------------ |
 | MacOS | Unity engine 5.4 | 3rd lib build config | Fully Tested |
 | Windows | Unity engine 5.4 | 3rd lib build config, visual studio 2022 (with desktop and game development c++)  | Fully Tested |
 
-### Installation
+# Installation
 ## FOR MACOS
-# Installation Guide
+### Installation Guide
 
 This guide provides step-by-step instructions for installing and setting up our library which is compatible macOS platforms. Ensure you have the following prerequisites installed to build the project:
 
-## Prerequisites
+### Prerequisites
 
 **Go** : https://go.dev/doc/install
 
 **Visual Studio Code** with C++ development environment
 
-## Installation Steps
+### Installation Steps
 
 1. Install **Visual Studio Code** with C++ development environment
 2. Install Go
 3. Install Unreal 5.4.1
 
-## Project Setup
-## FOR MACOS
+### Project Setup
 You can run **setup.sh** to do all these steps to set up the project environment:
 
 1. Build the project:
@@ -75,24 +74,24 @@ You can run **setup.sh** to do all these steps to set up the project environment
 https://github.com/VAR-META-Tech/unreal-nibi/assets/59425826/2ceed8bf-ab29-4a10-92c0-d71f2e9a021c
 
 ## FOR WINDOWS
-# Installation Guide
+### Installation Guide
 
 This guide provides step-by-step instructions for installing and setting up our library which is compatible Windows platforms. Ensure you have the following prerequisites installed to build the project:
 
-## Prerequisites
+### Prerequisites
 
 **Go** : https://go.dev/doc/install
 
 **Visual Studio 2022** with C++ development environment for Desktop and Game
 <img width="500" alt="Screenshot 2024-05-13 at 07 10 38" src="https://github.com/VAR-META-Tech/unreal-nibi/assets/133180467/c8102b17-0c6d-49af-a1b4-35a2e33f9ce9">
 
-## Installation Steps
+### Installation Steps
 
 1. Install **Visual Studio 2022** with C++ development environment
 2. Install Go
 3. Install Unreal 5.4.1
 
-## Project Setup
+### Project Setup
 
 Do all these steps to set up the project environment:
 
@@ -106,7 +105,7 @@ Do all these steps to set up the project environment:
     C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe -o sdk_test sdk_test.c unreal_nibi_sdk.dll
     ./sdk_test.exe
    ```
-### Example Unreal Project
+# Example Unreal Project
 
 An Example unreal project can be found in the following path:  
 `./UnrealExample/NibiruUnreal.uproject`. 
@@ -143,7 +142,7 @@ Follow these steps to run the Unreal Project Demo:
  
  ![](./Resource/OpenVSCodeByUnreal.png)
 
-### Integration sdk lib with Unreal Project
+# Integration sdk lib with Unreal Project
 For Unreal project please reference example in `NibiruUnreal`, you need define Build.cs to integration `unreal_nibi_sdk` library with Unreal engine.
 Here is an example:
 
@@ -185,7 +184,7 @@ public class NibiruUnreal : ModuleRules
 }
 ```
 
-### Using Unreal-Nibi-SDK with Blueprint
+# Using Unreal-Nibi-SDK with Blueprint
 
 **Create Wallet**
 ![](./Resource/CreateWallet.png)
@@ -196,7 +195,7 @@ public class NibiruUnreal : ModuleRules
 **Faucet**
 ![](./Resource/Faucet.png)
 
-### Testing
+# Testing
 
 To run unit test. You can do the following cmd:
 
@@ -204,16 +203,16 @@ To run unit test. You can do the following cmd:
 go test ./test/...
 ```
 
-### Go API
+# Go API
 
 You can check out this file to see what APIs we using: [gonibi.md](./gonibi.md)
 
-### Deploy CW721 contract
+# Deploy CW721 contract
 
 The CW721 contract is a specification for non-fungible tokens (NFTs) built on the CosmWasm platform. Inspired by Ethereum's ERC721 standard, CW721 introduces enhancements tailored to the CosmWasm ecosystem. These enhancements aim to provide a robust framework for creating and managing NFTs within decentralized applications (dApps) on the CosmWasm network.
 
 You can check out this file to see how to deploy CW721 contract and Mint an NFT [./deploy_cw721.md](./deploy_cw721.md)
 
-### License
+# License
 
 This project is licensed under the Apache-2.0 License. Refer to the LICENSE.txt file for details.
