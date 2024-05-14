@@ -51,7 +51,7 @@ This guide provides step-by-step instructions for installing and setting up our 
 3. Install Unreal 5.4.1
 
 ## Project Setup
-
+## FOR MACOS
 You can run **setup.sh** to do all these steps to set up the project environment:
 
 1. Build the project:
