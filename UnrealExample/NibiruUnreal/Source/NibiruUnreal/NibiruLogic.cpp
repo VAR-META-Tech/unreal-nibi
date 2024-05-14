@@ -164,6 +164,14 @@ void UNibiruLogic::OnFaucetClicked(FString address_received, bool &IsSuccess, FS
         FPlatformProcess::FreeDllHandle(DllHandle);
         return;
     }
+    GetAddressFromKeyNamePtr GetAddressFromKeyName = (GetAddressFromKeyNamePtr)FPlatformProcess::GetDllExport(DllHandle, (TEXT("GetAddressFromKeyName")));
+    if (GetAddressFromKeyName == nullptr) {
+        // Handle error, function not found
+        error_return = "Failed to find GetAddressFromKeyName function in DLL";
+        printf("Failed to find GetAddressFromKeyName function in DLL\n");
+        FPlatformProcess::FreeDllHandle(DllHandle);
+        return;
+    }
 #endif
     error_return ="";
     IsSuccess = false;
@@ -175,14 +183,6 @@ void UNibiruLogic::OnFaucetClicked(FString address_received, bool &IsSuccess, FS
     {
         error_return = "Failed to create admin account";
         printf("Failed to create account\n");
-        return;
-    }
-    GetAddressFromKeyNamePtr GetAddressFromKeyName = (GetAddressFromKeyNamePtr)FPlatformProcess::GetDllExport(DllHandle, (TEXT("GetAddressFromKeyName")));
-    if (GetAddressFromKeyName == nullptr) {
-        // Handle error, function not found
-        error_return = "Failed to find GetAddressFromKeyName function in DLL";
-        printf("Failed to find GetAddressFromKeyName function in DLL\n");
-        FPlatformProcess::FreeDllHandle(DllHandle);
         return;
     }
     char *adminAddress = GetAddressFromKeyName(keyNameAdmin);
