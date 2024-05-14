@@ -95,12 +95,11 @@ This guide provides step-by-step instructions for installing and setting up our 
 
 Do all these steps to set up the project environment:
 
-1. Build the project:
+1. Build the project: Need copy wasmvm.dll to mingw64 path: C:\TDM-GCC-64\lib
    ```sh
    go build -ldflags="-w" -o unreal_nibi_sdk.dll -buildmode=c-shared ./api.go
    ```
 3. To check Project Build Success and Test some function in Project:
-   Need copy wasmvm.dll to mingw64 path: C:\TDM-GCC-64\lib
    ```sh
     C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe -o sdk_test sdk_test.c unreal_nibi_sdk.dll
     ./sdk_test.exe
