@@ -36,14 +36,11 @@ public class NibiruUnreal : ModuleRules
 			string unreal_nibi_sdk_LibPath = Path.Combine(ModuleDirectory, "../../../../", "unreal_nibi_sdk.dll");
 			string cosmos_LibPath = Path.Combine(ModuleDirectory, "../../../../", "wasmvm.dll");
 			string destinationDirectory = Target.ProjectFile.Directory.FullName + "/Binaries/Win64";
-            if (Directory.Exists(destinationDirectory))
+            if (!Directory.Exists(destinationDirectory))
             {
-                Console.WriteLine("That path exists already.");
-                return;
+                // Try to create the directory.
+                DirectoryInfo di = Directory.CreateDirectory(destinationDirectory);
             }
-
-            // Try to create the directory.
-            DirectoryInfo di = Directory.CreateDirectory(destinationDirectory);
             File.Copy(unreal_nibi_sdk_LibPath, Path.Combine(destinationDirectory, "unreal_nibi_sdk.dll"), true);
 			File.Copy(cosmos_LibPath, Path.Combine(destinationDirectory, "wasmvm.dll"), true);
 			PublicDelayLoadDLLs.Add(Path.Combine(destinationDirectory, "unreal_nibi_sdk.dll"));
