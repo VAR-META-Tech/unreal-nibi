@@ -46,9 +46,9 @@ public class NibiruUnreal : ModuleRules
             DirectoryInfo di = Directory.CreateDirectory(destinationDirectory);
             File.Copy(unreal_nibi_sdk_LibPath, Path.Combine(destinationDirectory, "unreal_nibi_sdk.dll"), true);
 			File.Copy(cosmos_LibPath, Path.Combine(destinationDirectory, "wasmvm.dll"), true);
-            //PublicDelayLoadDLLs.Add(Path.Combine(destinationDirectory, "unreal_nibi_sdk.dll"));
-            //PublicDelayLoadDLLs.Add(Path.Combine(destinationDirectory, "wasmvm.dll"));
-            PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../") });
+			PublicDelayLoadDLLs.Add(Path.Combine(destinationDirectory, "unreal_nibi_sdk.dll"));
+			PublicDelayLoadDLLs.Add(Path.Combine(destinationDirectory, "wasmvm.dll"));
+			PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../") });
 			PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "../../../../") });
 		}
 		CppStandard = CppStandardVersion.Cpp17;
