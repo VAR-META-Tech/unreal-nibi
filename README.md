@@ -46,9 +46,10 @@ This guide provides step-by-step instructions for installing and setting up our 
 
 ### Installation Steps
 
-1. Install **Visual Studio Code** with C++ development environment
-2. Install Go
-3. Install Unreal 5.4.1
+1. Install Xcode
+2. Install **Visual Studio Code** with C++ development environment
+3. Install Go
+4. Install Unreal 5.4.1 and Launch UE (You need to create Epic Games account)
 
 ### Project Setup
 You can run **setup.sh** to do all these steps to set up the project environment:
@@ -95,12 +96,11 @@ This guide provides step-by-step instructions for installing and setting up our 
 
 Do all these steps to set up the project environment:
 
-1. Build the project:
+1. Build the project: Need copy wasmvm.dll to mingw64 path: C:\TDM-GCC-64\lib
    ```sh
    go build -ldflags="-w" -o unreal_nibi_sdk.dll -buildmode=c-shared ./api.go
    ```
 3. To check Project Build Success and Test some function in Project:
-   Need copy wasmvm.dll to mingw64 path: C:\TDM-GCC-64\lib
    ```sh
     C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe -o sdk_test sdk_test.c unreal_nibi_sdk.dll
     ./sdk_test.exe
