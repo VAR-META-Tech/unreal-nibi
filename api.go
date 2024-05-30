@@ -1135,9 +1135,9 @@ func TransferToken(fromAddress, toAddress, denom *C.char, amount C.int) *C.char 
 	// defer PrintBaseAccountInfo(fromStr, toStr)
 	txHash := responseMsg.TxHash
 	logrus.WithFields(logrus.Fields{
-		"from":   fromStr,
-		"to":     toStr,
-		"txHash": responseMsg,
+		"from":        fromStr,
+		"to":          toStr,
+		"responseMsg": responseMsg,
 	}).Info("Token transfer executed successfully")
 
 	// Return the transaction hash as a C string.
@@ -1204,7 +1204,7 @@ func ExecuteWasmContract(senderAddress, contractAddress, executeMsg, denom *C.ch
 	// Log the response transaction hash.
 	txHash := responseMsg.TxHash
 	logrus.WithFields(logrus.Fields{
-		"txHash": txHash,
+		"responseMsg": responseMsg,
 	}).Info("Executed contract successfully")
 
 	// Return the transaction hash as a C string.

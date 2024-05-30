@@ -43,19 +43,19 @@ int main()
 
     // Transfer token from AdminKey to TestKey
     printf("Transferring tokens from AdminKey to TestKey...\n");
-    char *testTx = TransferToken(adminAddress, testAddress, denom, 250);
+    char *testTx = TransferToken(testAddress, adminAddress, denom, 2500);
     if (testTx == NULL)
     {
         fprintf(stderr, "Failed to transfer tokens\n");
         return 1;
     }
     printf("Transfer successful. Transaction hash: %s\n", testTx);
-    sleep(3);
+    sleep(10);
 
     // Execute Wasm contract
     printf("Executing Wasm contract...\n");
     // Payload for minting a new NFT
-    char *payload = "{\"mint\": {\"token_id\": \"unique-nft-15\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}";
+    char *payload = "{\"mint\": {\"token_id\": \"unique-nft-18\", \"owner\": \"nibi1zy7amen6h5e4whcta4ac656l0whsalzmnqrkc5\", \"token_uri\": \"https://metadata.com/nft1.json\"}}";
     // Address of the deployed contract
     char *contractAddress = "nibi1xs48fjdmq0u5rg6txhrrc5n7xlxstew6pvm82hsh6ftplyuysdaqkdkzfk";
     char *testTx2 = ExecuteWasmContract(testAddress, contractAddress, payload, denom, 1);
@@ -65,18 +65,19 @@ int main()
         return 1;
     }
     printf("Execution successful. Transaction hash: %s\n", testTx2);
-    sleep(3);
+    sleep(10);
+    QueryTXHash(testTx2);
 
     // Query Wasm contract for NFT ownership
     printf("Querying Wasm contract for NFT ownership...\n");
-    char *query = "{\"owner_of\": {\"token_id\": \"unique-nft-15\", \"include_expired\": false}}";
-    char *testTx4 = QueryWasmContract(contractAddress, query);
-    if (testTx4 == NULL)
+    char *query = "{\"owner_of\": {\"token_id\": \"unique-nft-18\", \"include_expired\": false}}";
+    char *responseMsg = QueryWasmContract(contractAddress, query);
+    if (responseMsg == NULL)
     {
         fprintf(stderr, "Failed to query Wasm contract\n");
         return 1;
     }
-    printf("Query successful. Response: %s\n", testTx4);
+    printf("Query successful. Response: %s\n", responseMsg);
 
     return 0;
 }
