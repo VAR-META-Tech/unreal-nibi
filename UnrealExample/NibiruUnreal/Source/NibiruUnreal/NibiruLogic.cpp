@@ -219,10 +219,10 @@ void UNibiruLogic::OnTransferClicked(FString from_address, FString to_address, F
     error_return = "";
     auto convertedStr = StringCast<ANSICHAR>(*from_address);
     const char* fromAddress_ = convertedStr.Get();
-    auto convertedStr2 = StringCast<ANSICHAR>(*to_address);
-    const char* toAddress_ = convertedStr2.Get();
-    auto convertedStr3 = StringCast<ANSICHAR>(*demon);
-    const char* demonStr_ = convertedStr3.Get();
+    convertedStr = StringCast<ANSICHAR>(*to_address);
+    const char* toAddress_ = convertedStr.Get();
+    convertedStr = StringCast<ANSICHAR>(*demon);
+    const char* demonStr_ = convertedStr.Get();
     
     char* tx = TransferToken((char*)fromAddress_, (char*)toAddress_, (char*)demonStr_, amount);
 
