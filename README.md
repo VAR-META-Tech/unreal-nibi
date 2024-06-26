@@ -29,8 +29,8 @@ Unreal-Nibi-SDK is a cpp package written in C++ to help developers integrate Nib
 
 | Platforms   | Unreal Version   | Installation         | Status       |
 | ----------- | ---------------- | -------------------- | ------------ |
-| MacOS | Unity engine 5.4 | 3rd lib build config | Fully Tested |
-| Windows | Unity engine 5.4 | 3rd lib build config, visual studio 2022 (with desktop and game development c++)  | Fully Tested |
+| MacOS | Unreal engine 5.4 | 3rd lib build config | Fully Tested |
+| Windows | Unreal engine 5.4 | 3rd lib build config, visual studio 2022 (with desktop and game development c++)  | Fully Tested |
 
 # Installation
 ## FOR MACOS
